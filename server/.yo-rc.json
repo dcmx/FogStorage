@@ -1,0 +1,43 @@
+{
+  "generator-jhipster": {
+    "applicationType": "microservice",
+    "gitCompany": "",
+    "baseName": "middleware",
+    "packageName": "com.fonkwill.fogstorage.middleware",
+    "packageFolder": "com/fonkwill/fogstorage/middleware",
+    "serverPort": 8081,
+    "serviceDiscoveryType": false,
+    "authenticationType": "jwt",
+    "uaaBaseName": "../uaa",
+    "cacheProvider": "no",
+    "enableHibernateCache": false,
+    "websocket": false,
+    "databaseType": "sql",
+    "devDatabaseType": "h2Disk",
+    "prodDatabaseType": "postgresql",
+    "searchEngine": false,
+    "enableSwaggerCodegen": false,
+    "messageBroker": false,
+    "buildTool": "maven",
+    "useSass": false,
+    "clientPackageManager": "npm",
+    "testFrameworks": [],
+    "enableTranslation": false,
+    "nativeLanguage": "en",
+    "languages": [
+      "en"
+    ],
+    "clientFramework": "angularX",
+    "jhiPrefix": "jhi",
+    "jhipsterVersion": "6.1.2",
+    "jwtSecretKey": "OTU2NDEzODZkMTUwOTRjZDk1ODJiOGRhZTUxNDZlN2Y1MGY3ZmRkNjBlZmI5MmFiYTRiZTRkYjlhZTk0NWY2Y2ZkZGUyNGIxMzkwY2VlYTVlNjFmNTZlZWFhYmQ3OGUyYTRhMTgyYjg1OGFkOWIzNjExYTk0ODQ1ZWFhYjUxYWM=",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "skipClient": true,
+    "skipUserManagement": true
+  },
+  "git-provider": "GitLab",
+  "git-company": "fonkwill",
+  "repository-name": "fogstorage-middleware"
+}
