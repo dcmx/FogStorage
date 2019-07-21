@@ -1,0 +1,44 @@
+{
+    "name": "Chunk",
+    "fields": [
+        {
+            "fieldName": "uuid",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "size",
+            "fieldType": "Long"
+        },
+        {
+            "fieldName": "accessed",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "storedLocally",
+            "fieldType": "Boolean"
+        },
+        {
+            "fieldName": "partner",
+            "fieldType": "String"
+        }
+    ],
+    "relationships": [
+        {
+            "relationshipType": "many-to-one",
+            "otherEntityName": "node",
+            "otherEntityRelationshipName": "chunk",
+            "relationshipName": "node",
+            "otherEntityField": "id"
+        }
+    ],
+    "changelogDate": "20190721151738",
+    "entityTableName": "chunk",
+    "dto": "no",
+    "pagination": "no",
+    "service": "serviceImpl",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "middleware",
+    "applications": "*",
+    "microserviceName": "middleware"
+}
