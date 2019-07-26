@@ -1,6 +1,6 @@
 package com.fonkwill.fogstorage.middleware;
 
-import com.fonkwill.fogstorage.middleware.config.DefaultProfileUtil;
+import com.fonkwill.fogstorage.middleware.shared.config.DefaultProfileUtil;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 

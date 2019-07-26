@@ -1,7 +1,7 @@
 package com.fonkwill.fogstorage.middleware;
 
-import com.fonkwill.fogstorage.middleware.config.ApplicationProperties;
-import com.fonkwill.fogstorage.middleware.config.DefaultProfileUtil;
+import com.fonkwill.fogstorage.middleware.shared.config.ApplicationProperties;
+import com.fonkwill.fogstorage.middleware.shared.config.DefaultProfileUtil;
 
 import io.github.jhipster.config.JHipsterConstants;
 
