@@ -6,6 +6,12 @@ entity Chunk {
     partner String
 }
 
+entity GeneralValue {
+	key String,
+    value String,
+    type String
+}
+
 entity Node {
 	name String,
     url String,
