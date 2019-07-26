@@ -1,27 +1,22 @@
 {
-    "name": "Node",
+    "name": "GeneralValue",
     "fields": [
         {
-            "fieldName": "name",
+            "fieldName": "key",
             "fieldType": "String"
         },
         {
-            "fieldName": "url",
+            "fieldName": "value",
             "fieldType": "String"
         },
         {
             "fieldName": "type",
-            "fieldType": "FogStorageNodeType",
-            "fieldValues": "AWS,GCP,FOG"
-        },
-        {
-            "fieldName": "latency",
-            "fieldType": "Long"
+            "fieldType": "String"
         }
     ],
     "relationships": [],
-    "changelogDate": "20190726130958",
-    "entityTableName": "node",
+    "changelogDate": "20190726130957",
+    "entityTableName": "general_value",
     "dto": "no",
     "pagination": "no",
     "service": "serviceImpl",

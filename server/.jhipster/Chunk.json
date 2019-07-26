@@ -31,7 +31,7 @@
             "otherEntityField": "id"
         }
     ],
-    "changelogDate": "20190721151738",
+    "changelogDate": "20190726130956",
     "entityTableName": "chunk",
     "dto": "no",
     "pagination": "no",
