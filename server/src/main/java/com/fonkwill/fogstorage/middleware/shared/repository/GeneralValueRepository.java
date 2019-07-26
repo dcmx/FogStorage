@@ -1,6 +1,6 @@
-package com.fonkwill.fogstorage.middleware.repository;
+package com.fonkwill.fogstorage.middleware.shared.repository;
 
-import com.fonkwill.fogstorage.middleware.domain.GeneralValue;
+import com.fonkwill.fogstorage.middleware.shared.domain.GeneralValue;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 

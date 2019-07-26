@@ -1,10 +1,11 @@
-package com.fonkwill.fogstorage.middleware.web.rest;
+package com.fonkwill.fogstorage.middleware.api;
 
 import com.fonkwill.fogstorage.middleware.MiddlewareApp;
-import com.fonkwill.fogstorage.middleware.domain.GeneralValue;
-import com.fonkwill.fogstorage.middleware.repository.GeneralValueRepository;
-import com.fonkwill.fogstorage.middleware.service.GeneralValueService;
-import com.fonkwill.fogstorage.middleware.web.rest.errors.ExceptionTranslator;
+import com.fonkwill.fogstorage.middleware.api.GeneralValueResource;
+import com.fonkwill.fogstorage.middleware.shared.domain.GeneralValue;
+import com.fonkwill.fogstorage.middleware.shared.repository.GeneralValueRepository;
+import com.fonkwill.fogstorage.middleware.shared.service.GeneralValueService;
+import com.fonkwill.fogstorage.middleware.api.errors.ExceptionTranslator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ import org.springframework.validation.Validator;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static com.fonkwill.fogstorage.middleware.web.rest.TestUtil.createFormattingConversionService;
+import static com.fonkwill.fogstorage.middleware.api.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;

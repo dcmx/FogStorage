@@ -1,8 +1,8 @@
-package com.fonkwill.fogstorage.middleware.service.impl;
+package com.fonkwill.fogstorage.middleware.shared.service.impl;
 
-import com.fonkwill.fogstorage.middleware.service.GeneralValueService;
-import com.fonkwill.fogstorage.middleware.domain.GeneralValue;
-import com.fonkwill.fogstorage.middleware.repository.GeneralValueRepository;
+import com.fonkwill.fogstorage.middleware.shared.service.GeneralValueService;
+import com.fonkwill.fogstorage.middleware.shared.domain.GeneralValue;
+import com.fonkwill.fogstorage.middleware.shared.repository.GeneralValueRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

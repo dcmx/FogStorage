@@ -1,8 +1,8 @@
-package com.fonkwill.fogstorage.middleware.web.rest;
+package com.fonkwill.fogstorage.middleware.api;
 
-import com.fonkwill.fogstorage.middleware.domain.GeneralValue;
-import com.fonkwill.fogstorage.middleware.service.GeneralValueService;
-import com.fonkwill.fogstorage.middleware.web.rest.errors.BadRequestAlertException;
+import com.fonkwill.fogstorage.middleware.shared.domain.GeneralValue;
+import com.fonkwill.fogstorage.middleware.shared.service.GeneralValueService;
+import com.fonkwill.fogstorage.middleware.api.errors.BadRequestAlertException;
 
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * REST controller for managing {@link com.fonkwill.fogstorage.middleware.domain.GeneralValue}.
+ * REST controller for managing {@link GeneralValue}.
  */
 @RestController
 @RequestMapping("/api")

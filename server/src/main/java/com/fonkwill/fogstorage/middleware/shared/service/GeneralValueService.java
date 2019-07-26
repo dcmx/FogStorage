@@ -1,6 +1,6 @@
-package com.fonkwill.fogstorage.middleware.service;
+package com.fonkwill.fogstorage.middleware.shared.service;
 
-import com.fonkwill.fogstorage.middleware.domain.GeneralValue;
+import com.fonkwill.fogstorage.middleware.shared.domain.GeneralValue;
 
 import java.util.List;
 import java.util.Optional;

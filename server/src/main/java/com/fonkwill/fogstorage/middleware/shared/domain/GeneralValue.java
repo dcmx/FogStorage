@@ -1,4 +1,4 @@
-package com.fonkwill.fogstorage.middleware.domain;
+package com.fonkwill.fogstorage.middleware.shared.domain;
 
 import javax.persistence.*;
 
