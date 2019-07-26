@@ -35,7 +35,7 @@
                 <constraints nullable="true" />
             </column>
 
-            <column name="node_id" type="bigint">
+            <column name="node_name" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
 

@@ -1,7 +1,7 @@
 package com.fonkwill.fogstorage.middleware.api;
 
 import com.fonkwill.fogstorage.middleware.shared.domain.Node;
-import com.fonkwill.fogstorage.middleware.shared.service.NodeService;
+import com.fonkwill.fogstorage.middleware.controller.service.NodeService;
 import com.fonkwill.fogstorage.middleware.api.errors.BadRequestAlertException;
 
 import io.github.jhipster.web.util.HeaderUtil;
@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
@@ -48,13 +49,24 @@ public class NodeResource {
     @PostMapping("/nodes")
     public ResponseEntity<Node> createNode(@RequestBody Node node) throws URISyntaxException {
         log.debug("REST request to save Node : {}", node);
-        if (node.getId() != null) {
-            throw new BadRequestAlertException("A new node cannot already have an ID", ENTITY_NAME, "idexists");
+        if (existsAlready(node)) {
+            throw new BadRequestAlertException("The node is already stored - use update", ENTITY_NAME, "idexists");
         }
         Node result = nodeService.save(node);
-        return ResponseEntity.created(new URI("/api/nodes/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+        return ResponseEntity.created(new URI("/api/nodes/" + result.getName()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getName().toString()))
             .body(result);
+    }
+
+    private boolean existsAlready(@RequestBody Node node) {
+        boolean alreadyExists = false;
+        try {
+            nodeService.findOne(node.getName()).get();
+            alreadyExists = true;
+        }catch(NoSuchElementException ex) {
+            //do nothing, as boolean is set already
+        }
+        return alreadyExists;
     }
 
     /**
@@ -69,12 +81,15 @@ public class NodeResource {
     @PutMapping("/nodes")
     public ResponseEntity<Node> updateNode(@RequestBody Node node) throws URISyntaxException {
         log.debug("REST request to update Node : {}", node);
-        if (node.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        if (node.getName() == null) {
+            throw new BadRequestAlertException("Invalid name", ENTITY_NAME, "idnull");
+        }
+        if (!existsAlready(node)) {
+            throw new BadRequestAlertException("Node doesn't exist", ENTITY_NAME, "idnull");
         }
         Node result = nodeService.save(node);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, node.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, node.getName()))
             .body(result);
     }
 
@@ -90,28 +105,28 @@ public class NodeResource {
     }
 
     /**
-     * {@code GET  /nodes/:id} : get the "id" node.
+     * {@code GET  /nodes/:name} : get the "name" node.
      *
-     * @param id the id of the node to retrieve.
+     * @param name the name of the node to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the node, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/nodes/{id}")
-    public ResponseEntity<Node> getNode(@PathVariable Long id) {
-        log.debug("REST request to get Node : {}", id);
-        Optional<Node> node = nodeService.findOne(id);
+    @GetMapping("/nodes/{name}")
+    public ResponseEntity<Node> getNode(@PathVariable String name) {
+        log.debug("REST request to get Node : {}", name);
+        Optional<Node> node = nodeService.findOne(name);
         return ResponseUtil.wrapOrNotFound(node);
     }
 
     /**
-     * {@code DELETE  /nodes/:id} : delete the "id" node.
+     * {@code DELETE  /nodes/:id} : delete the "name" node.
      *
-     * @param id the id of the node to delete.
+     * @param name the name of the node to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/nodes/{id}")
-    public ResponseEntity<Void> deleteNode(@PathVariable Long id) {
-        log.debug("REST request to delete Node : {}", id);
-        nodeService.delete(id);
-        return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString())).build();
+    @DeleteMapping("/nodes/{name}")
+    public ResponseEntity<Void> deleteNode(@PathVariable String name) {
+        log.debug("REST request to delete Node : {}", name);
+        nodeService.delete(name);
+        return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, name)).build();
     }
 }

@@ -1,8 +1,8 @@
-package com.fonkwill.fogstorage.middleware.shared.service.impl;
+package com.fonkwill.fogstorage.middleware.controller.service.impl;
 
-import com.fonkwill.fogstorage.middleware.shared.service.NodeService;
+import com.fonkwill.fogstorage.middleware.controller.service.NodeService;
 import com.fonkwill.fogstorage.middleware.shared.domain.Node;
-import com.fonkwill.fogstorage.middleware.shared.repository.NodeRepository;
+import com.fonkwill.fogstorage.middleware.controller.repository.NodeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,26 +53,27 @@ public class NodeServiceImpl implements NodeService {
 
 
     /**
-     * Get one node by id.
+     * Get one node by name.
      *
-     * @param id the id of the entity.
+     * @param name the name of the entity.
      * @return the entity.
      */
     @Override
     @Transactional(readOnly = true)
-    public Optional<Node> findOne(Long id) {
-        log.debug("Request to get Node : {}", id);
-        return nodeRepository.findById(id);
+    public Optional<Node> findOne(String name) {
+        log.debug("Request to get Node : {}", name);
+        return nodeRepository.findById(name);
     }
 
     /**
-     * Delete the node by id.
+     * Delete the node by name.
      *
-     * @param id the id of the entity.
+     * @param name the name of the entity.
      */
     @Override
-    public void delete(Long id) {
-        log.debug("Request to delete Node : {}", id);
-        nodeRepository.deleteById(id);
+    public void delete(String name) {
+        log.debug("Request to delete Node : {}", name);
+        nodeRepository.deleteById(name);
     }
+
 }

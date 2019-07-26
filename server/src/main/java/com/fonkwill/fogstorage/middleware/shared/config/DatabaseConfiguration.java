@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import java.sql.SQLException;
 
 @Configuration
-@EnableJpaRepositories("com.fonkwill.fogstorage.middleware.shared.repository")
+@EnableJpaRepositories({"com.fonkwill.fogstorage.middleware.shared.repository", "com.fonkwill.fogstorage.middleware.controller.repository" })
 @EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware")
 @EnableTransactionManagement
 public class DatabaseConfiguration {

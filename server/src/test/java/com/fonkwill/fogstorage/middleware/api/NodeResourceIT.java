@@ -2,8 +2,8 @@ package com.fonkwill.fogstorage.middleware.api;
 
 import com.fonkwill.fogstorage.middleware.MiddlewareApp;
 import com.fonkwill.fogstorage.middleware.shared.domain.Node;
-import com.fonkwill.fogstorage.middleware.shared.repository.NodeRepository;
-import com.fonkwill.fogstorage.middleware.shared.service.NodeService;
+import com.fonkwill.fogstorage.middleware.controller.repository.NodeRepository;
+import com.fonkwill.fogstorage.middleware.controller.service.NodeService;
 import com.fonkwill.fogstorage.middleware.api.errors.ExceptionTranslator;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -142,10 +142,12 @@ public class NodeResourceIT {
     @Test
     @Transactional
     public void createNodeWithExistingId() throws Exception {
+        nodeRepository.save(createEntity(em));
+
         int databaseSizeBeforeCreate = nodeRepository.findAll().size();
 
         // Create the Node with an existing ID
-        node.setId(1L);
+        node.name("AAAAAAAAAA");
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restNodeMockMvc.perform(post("/api/nodes")
@@ -169,7 +171,6 @@ public class NodeResourceIT {
         restNodeMockMvc.perform(get("/api/nodes?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(node.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].url").value(hasItem(DEFAULT_URL.toString())))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
@@ -183,10 +184,9 @@ public class NodeResourceIT {
         nodeRepository.saveAndFlush(node);
 
         // Get the node
-        restNodeMockMvc.perform(get("/api/nodes/{id}", node.getId()))
+        restNodeMockMvc.perform(get("/api/nodes/{name}", node.getName()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.id").value(node.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
             .andExpect(jsonPath("$.url").value(DEFAULT_URL.toString()))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
@@ -210,11 +210,10 @@ public class NodeResourceIT {
         int databaseSizeBeforeUpdate = nodeRepository.findAll().size();
 
         // Update the node
-        Node updatedNode = nodeRepository.findById(node.getId()).get();
+        Node updatedNode = nodeRepository.findById(node.getName()).get();
         // Disconnect from session so that the updates on updatedNode are not directly saved in db
         em.detach(updatedNode);
         updatedNode
-            .name(UPDATED_NAME)
             .url(UPDATED_URL)
             .type(UPDATED_TYPE)
             .latency(UPDATED_LATENCY);
@@ -228,7 +227,6 @@ public class NodeResourceIT {
         List<Node> nodeList = nodeRepository.findAll();
         assertThat(nodeList).hasSize(databaseSizeBeforeUpdate);
         Node testNode = nodeList.get(nodeList.size() - 1);
-        assertThat(testNode.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testNode.getUrl()).isEqualTo(UPDATED_URL);
         assertThat(testNode.getType()).isEqualTo(UPDATED_TYPE);
         assertThat(testNode.getLatency()).isEqualTo(UPDATED_LATENCY);
@@ -261,7 +259,7 @@ public class NodeResourceIT {
         int databaseSizeBeforeDelete = nodeRepository.findAll().size();
 
         // Delete the node
-        restNodeMockMvc.perform(delete("/api/nodes/{id}", node.getId())
+        restNodeMockMvc.perform(delete("/api/nodes/{name}", node.getName())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isNoContent());
 
@@ -275,13 +273,13 @@ public class NodeResourceIT {
     public void equalsVerifier() throws Exception {
         TestUtil.equalsVerifier(Node.class);
         Node node1 = new Node();
-        node1.setId(1L);
+        node1.setName("AA");
         Node node2 = new Node();
-        node2.setId(node1.getId());
+        node2.setName(node1.getName());
         assertThat(node1).isEqualTo(node2);
-        node2.setId(2L);
+        node2.setName("BB");
         assertThat(node1).isNotEqualTo(node2);
-        node1.setId(null);
+        node1.setName(null);
         assertThat(node1).isNotEqualTo(node2);
     }
 }

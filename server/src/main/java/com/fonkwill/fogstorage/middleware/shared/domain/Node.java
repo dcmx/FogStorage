@@ -16,10 +16,6 @@ public class Node implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    private Long id;
-
     @Column(name = "name")
     private String name;
 
@@ -34,13 +30,6 @@ public class Node implements Serializable {
     private Long latency;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -103,7 +92,7 @@ public class Node implements Serializable {
         if (!(o instanceof Node)) {
             return false;
         }
-        return id != null && id.equals(((Node) o).id);
+        return name != null && name.equals(((Node) o).name);
     }
 
     @Override
@@ -114,11 +103,11 @@ public class Node implements Serializable {
     @Override
     public String toString() {
         return "Node{" +
-            "id=" + getId() +
-            ", name='" + getName() + "'" +
+            " name='" + getName() + "'" +
             ", url='" + getUrl() + "'" +
             ", type='" + getType() + "'" +
             ", latency=" + getLatency() +
             "}";
     }
+
 }

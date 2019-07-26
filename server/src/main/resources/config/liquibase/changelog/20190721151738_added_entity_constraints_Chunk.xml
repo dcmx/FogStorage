@@ -8,10 +8,10 @@
     -->
     <changeSet id="20190721151738-2" author="jhipster">
         
-        <addForeignKeyConstraint baseColumnNames="node_id"
+        <addForeignKeyConstraint baseColumnNames="node_name"
                                  baseTableName="chunk"
-                                 constraintName="fk_chunk_node_id"
-                                 referencedColumnNames="id"
+                                 constraintName="fk_chunk_node_name"
+                                 referencedColumnNames="name"
                                  referencedTableName="node"/>
 
     </changeSet>

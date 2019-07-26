@@ -12,11 +12,9 @@
     -->
     <changeSet id="20190721151739-1" author="jhipster">
         <createTable tableName="node">
-            <column name="id" type="bigint" autoIncrement="${autoIncrement}">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
+
             <column name="name" type="varchar(255)">
-                <constraints nullable="true" />
+                <constraints primaryKey="true" nullable="false" />
             </column>
 
             <column name="url" type="varchar(255)">

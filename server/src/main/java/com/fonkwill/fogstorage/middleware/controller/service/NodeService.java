@@ -1,4 +1,4 @@
-package com.fonkwill.fogstorage.middleware.shared.service;
+package com.fonkwill.fogstorage.middleware.controller.service;
 
 import com.fonkwill.fogstorage.middleware.shared.domain.Node;
 
@@ -27,17 +27,18 @@ public interface NodeService {
 
 
     /**
-     * Get the "id" node.
+     * Get the "name" node.
      *
-     * @param id the id of the entity.
+     * @param name the name of the entity.
      * @return the entity.
      */
-    Optional<Node> findOne(Long id);
+    Optional<Node> findOne(String name);
 
     /**
-     * Delete the "id" node.
+     * Delete the "name" node.
      *
-     * @param id the id of the entity.
+     * @param name the name of the entity.
      */
-    void delete(Long id);
-}
+    void delete(String name);
+
+ }
