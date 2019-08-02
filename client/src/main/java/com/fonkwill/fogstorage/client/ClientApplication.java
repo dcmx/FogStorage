@@ -1,16 +1,18 @@
 package com.fonkwill.fogstorage.client;
 
+import com.fonkwill.fogstorage.client.configuration.ApplicationProperties;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
-@EnableFeignClients
+
+
 @SpringBootApplication
+@EnableConfigurationProperties({ApplicationProperties.class})
 public class ClientApplication implements CommandLineRunner {
 
 	private static final Logger logger = LoggerFactory.getLogger(ClientApplication.class);
