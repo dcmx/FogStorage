@@ -34,7 +34,7 @@ public class FogStorageServiceITest {
     ResourceLoader resourceLoader;
 
     //@Value("${application-test.fog-url}")
-    private String fog_url = "http:localhost:8081";
+    private String fog_url = "";
 
     private static final Logger logger = LoggerFactory.getLogger(FogStorageServiceITest.class);
 
@@ -83,7 +83,7 @@ public class FogStorageServiceITest {
         strategy.setDataChunksCount(2);
         strategy.setUseFogAsStorage(false);
 
-        placement.setOriginalFileInfo(originalFile);
+     //   placement.setOriginalFileInfo(originalFile);
         placement.setStoredAtList(assignment);
         placement.setPlacementStrategy(strategy);
 

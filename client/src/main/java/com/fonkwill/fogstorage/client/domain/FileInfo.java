@@ -21,4 +21,6 @@ public class FileInfo {
     public void setSize(Long size) {
         this.size = size;
     }
+
+
 }

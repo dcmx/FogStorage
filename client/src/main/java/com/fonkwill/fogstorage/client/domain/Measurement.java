@@ -2,6 +2,8 @@ package com.fonkwill.fogstorage.client.domain;
 
 import okhttp3.Headers;
 
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class Measurement {
@@ -33,4 +35,24 @@ public class Measurement {
     public String getPlacementCalculationTime() {
         return headers.get(prefix + placementCalculationTimeKey);
     }
+
+    public Map<String, String> getAllNodesTransferTime() {
+        if (headers == null) {
+            return null;
+        }
+        String nodeTransferTime = prefix + nodeTransferTimeKey;
+        int length = nodeTransferTime.length();
+
+        Map<String, String> result = new HashMap<>();
+        for (String name : headers.names()){
+            if (name.startsWith(nodeTransferTime)) {
+                String node = name.substring(length);
+                result.put(node, getNodeTransferTime(node));
+            }
+        }
+        return result;
+
+    }
+
+
 }

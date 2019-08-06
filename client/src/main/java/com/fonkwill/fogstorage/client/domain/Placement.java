@@ -1,5 +1,6 @@
 package com.fonkwill.fogstorage.client.domain;
 
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,8 +12,15 @@ public class Placement {
 
     private PlacementStrategy placementStrategy;
 
-    private FileInfo originalFileInfo;
+    public FileInfo getFileInfo() {
+        return originalFileInfo;
+    }
 
+    public void setOriginalFileInfo(FileInfo originalFileInfo) {
+        this.originalFileInfo = originalFileInfo;
+    }
+
+    private FileInfo originalFileInfo;
 
     public List<Assignment> getStoredAtList() {
         return storedAtList;
@@ -22,21 +30,12 @@ public class Placement {
         this.storedAtList = storedAtList;
     }
 
-
     public PlacementStrategy getPlacementStrategy() {
         return placementStrategy;
     }
 
     public void setPlacementStrategy(PlacementStrategy placementStrategy) {
         this.placementStrategy = placementStrategy;
-    }
-
-    public FileInfo getOriginalFileInfo() {
-        return originalFileInfo;
-    }
-
-    public void setOriginalFileInfo(FileInfo originalFileInfo) {
-        this.originalFileInfo = originalFileInfo;
     }
 
     public static class Assignment{
