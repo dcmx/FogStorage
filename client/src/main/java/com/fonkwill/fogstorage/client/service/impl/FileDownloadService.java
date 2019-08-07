@@ -4,11 +4,11 @@ import com.fonkwill.fogstorage.client.client.FogStorageService;
 import com.fonkwill.fogstorage.client.domain.*;
 import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
 import com.fonkwill.fogstorage.client.service.exception.FileServiceException;
+import com.fonkwill.fogstorage.client.service.utils.Stopwatch;
 import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StopWatch;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -52,15 +52,17 @@ public class FileDownloadService extends  AbstractFileService {
         try {
             byte[] contentDownload = responseBody.bytes();
 
-            StopWatch stopWatch = new StopWatch();
+
             if (encryptionActivated) {
+                Stopwatch stopWatch = new Stopwatch();
                 try {
                     contentDownload = decrypter.decrypt(contentDownload);
                 } catch (EncryptionException e) {
                     throw new FileServiceException("Could not decrypt data");
                 }
+                decryptionTime = stopWatch.stop();
             }
-            stopWatch.stop();
+
             bytes.setContent(contentDownload);
 
 

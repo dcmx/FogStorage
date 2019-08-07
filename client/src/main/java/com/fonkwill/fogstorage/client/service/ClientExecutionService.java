@@ -1,11 +1,17 @@
 package com.fonkwill.fogstorage.client.service;
 
+import com.fonkwill.fogstorage.client.domain.MeasurementResult;
 import com.fonkwill.fogstorage.client.domain.PlacementStrategy;
 import com.fonkwill.fogstorage.client.domain.UploadMode;
 import com.fonkwill.fogstorage.client.service.exception.ClientServiceException;
+import com.fonkwill.fogstorage.client.service.exception.FileServiceException;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
 
 public class ClientExecutionService {
 
@@ -20,12 +26,15 @@ public class ClientExecutionService {
     private Option hostOption = new Option("h", true, "Host");
     private Option splitOption = new Option("n", true, "Number of kilobytes for splitting up the file");
     private Option encryptionOption = new Option("e", false, "AesEncryptionService enabled");
+    private Option scenarioOption = new Option("s", true, "Scenario with given file");
 
     private CommandLine cmd;
 
     private FogStorageContext fogStorageContext;
 
-    public ClientExecutionService(String[] args, FogStorageContext fogStorageContext) throws ClientServiceException {
+    private FileService fileService;
+
+    public ClientExecutionService(String[] args, FogStorageContext fogStorageContext, FileService fileService) throws ClientServiceException {
         this.fogStorageContext = fogStorageContext;
         options.addOption(uploadOption);
         options.addOption(useFogAsStorageOption);
@@ -35,6 +44,7 @@ public class ClientExecutionService {
         options.addOption(downloadOption);
         options.addOption(splitOption);
         options.addOption(encryptionOption);
+        options.addOption(scenarioOption);
         CommandLineParser parser = new DefaultParser();
 
         try {
@@ -51,7 +61,11 @@ public class ClientExecutionService {
         this.fogStorageContext.setSplitMode(isInSplitMode());
         this.fogStorageContext.setCountBytesForSplit(getBytesCountForSplit());
         this.fogStorageContext.setEncryptionMode(isInEcryptionMode());
+
+        this.fileService = fileService;
     }
+
+
 
 
     public boolean isUploadMode() {
@@ -64,6 +78,10 @@ public class ClientExecutionService {
         } else {
             return cmd.getOptionValue(downloadOption.getOpt());
         }
+    }
+
+    public String getScenarioFile() {
+        return cmd.getOptionValue(scenarioOption.getOpt());
     }
 
     public boolean isInSplitMode() {
@@ -132,4 +150,49 @@ public class ClientExecutionService {
     }
 
 
+    public boolean isScenarioMode() {
+        return cmd.hasOption(scenarioOption.getOpt());
+    }
+
+    public void execute() {
+        if (isUploadMode()) {
+
+            String file = getFile();
+
+            UploadMode uploadMode = getUploadMode();
+
+            Path path = Paths.get(file);
+            MeasurementResult measurement = null;
+            try {
+                measurement = fileService.upload(path, uploadMode);
+            } catch (FileServiceException e) {
+                logger.error("Could not upload file", e);
+                return;
+            }
+            logMeasurements(measurement);
+
+        } else if(isDownloadMode()) {
+            String file = getFile();
+
+            Path path = Paths.get(file);
+            MeasurementResult measurementResult = null;
+            try {
+                measurementResult = fileService.download(path);
+            } catch (FileServiceException e) {
+                logger.error("Could not download file", e);
+                return;
+            }
+            logMeasurements(measurementResult);
+        }
+    }
+
+    private void logMeasurements(MeasurementResult measurement) {
+        logger.info("EnDecryption time: {} ", measurement.getEnDecryptionTime());
+        logger.info("Coding time: {}", measurement.getCodingTime());
+        logger.info("Total transfer time: {}", measurement.getTotalTransferTime());
+        logger.info("Placement calculation time : {}", measurement.getPlacementCalculationTime());
+        for (Map.Entry<String, Long> entry : measurement.getAllNodesTransferTime().entrySet()) {
+            logger.info("Transfer time for {} : {}", entry.getKey(), entry.getValue());
+        }
+    }
 }
