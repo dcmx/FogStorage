@@ -8,9 +8,8 @@ public class FogStorageContext {
 
     private boolean splitMode;
 
-
-
     private int countBytesForSplit;
+    private boolean encryptionMode;
 
     public String getHost() {
         return host;
@@ -36,4 +35,11 @@ public class FogStorageContext {
         return splitMode;
     }
 
+    public void setEncryptionMode(boolean inEcryptionMode) {
+        this.encryptionMode = inEcryptionMode;
+    }
+
+    public boolean isEncryptionMode() {
+        return encryptionMode;
+    }
 }

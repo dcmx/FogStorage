@@ -21,6 +21,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Security;
 import java.util.Map;
 
 
@@ -42,6 +43,7 @@ public class ClientApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+
         ClientExecutionService executionService = null;
 	    try {
             executionService = new ClientExecutionService(args, fogStorageContext);
@@ -78,10 +80,11 @@ public class ClientApplication implements CommandLineRunner {
                 return;
             }
             logMeasurements(measurementResult);
-        }
+        } 
 	}
 
     private void logMeasurements(MeasurementResult measurement) {
+	    logger.info("EnDecryption time: {} ", measurement.getEnDecryptionTime());
         logger.info("Coding time: {}", measurement.getCodingTime());
         logger.info("Total transfer time: {}", measurement.getTotalTransferTime());
         logger.info("Placement calculation time : {}", measurement.getPlacementCalculationTime());

@@ -16,6 +16,8 @@ public class Measurement {
 
     private Headers headers;
 
+    private Long enDecryptionTime = 0L;
+
     public Measurement(Headers headers) {
         this.headers = headers;
     }
@@ -55,4 +57,11 @@ public class Measurement {
     }
 
 
+    public void setEnDecryptionTime(long encryptionTime) {
+        this.enDecryptionTime = encryptionTime;
+    }
+
+    public Long getEnDecryptionTime() {
+        return enDecryptionTime;
+    }
 }

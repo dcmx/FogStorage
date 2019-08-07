@@ -2,6 +2,9 @@ package com.fonkwill.fogstorage.client.service.impl;
 
 import com.fonkwill.fogstorage.client.client.FogStorageService;
 import com.fonkwill.fogstorage.client.domain.*;
+import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
+import com.fonkwill.fogstorage.client.encryption.impl.AesDecryptionService;
+import com.fonkwill.fogstorage.client.encryption.impl.AesEncryptionService;
 import com.fonkwill.fogstorage.client.repository.PlacementRepository;
 import com.fonkwill.fogstorage.client.service.FileService;
 import com.fonkwill.fogstorage.client.service.FogStorageContext;
@@ -66,6 +69,7 @@ public class FileServiceImpl implements FileService {
 
             fileDownloadService = new FileDownloadService(fogStorageService);
             fileUploadService = new FileUploadService(fogStorageService);
+
         }
     }
 
@@ -75,6 +79,19 @@ public class FileServiceImpl implements FileService {
 
         RegenerationInfo placement = placementRepository.getPlacement(toPlacement);
         List<Placement> placementList = placement.getPlacementList();
+
+        if (placement.getKey() != null && !placement.getKey().isEmpty()) {
+            try {
+                AesDecryptionService encryptionService = new AesDecryptionService(placement.getKey());
+                fileDownloadService.enableEncryption();
+                fileDownloadService.setDecrypter(encryptionService);
+            } catch (EncryptionException e) {
+                throw new FileServiceException("Error at creating Encryption Service");
+            }
+        } else {
+            fileDownloadService.disableEncryption();
+        }
+
 
         Path targetDirectory = toPlacement.getParent();
         Path targetFilePath = Paths.get(targetDirectory.toString(), placement.getFileName());
@@ -91,6 +108,21 @@ public class FileServiceImpl implements FileService {
     @Override
     public MeasurementResult upload(Path toFile, UploadMode uploadMode) throws FileServiceException {
         init();
+
+        RegenerationInfo regenerationInfo = new RegenerationInfo();
+
+        if (fogStorageContext.isEncryptionMode()) {
+            try {
+                AesEncryptionService encryptionService = new AesEncryptionService();
+                regenerationInfo.setKey(encryptionService.getKey());
+                fileUploadService.enableEncryption();
+                fileUploadService.setEncrypter(encryptionService);
+            } catch (EncryptionException e) {
+                throw new FileServiceException("Error at creating Encryption Service", e);
+            }
+        } else {
+            fileUploadService.disableEncryption();
+        }
 
         int bytesForSplit = -1;
 
@@ -115,7 +147,6 @@ public class FileServiceImpl implements FileService {
             measurementResult.addMeasurement(processingResult.getMeasurement());
         }
 
-        RegenerationInfo regenerationInfo = new RegenerationInfo();
         regenerationInfo.setPlacementList(placementList);
         regenerationInfo.setFileName(fileName);
         regenerationInfo.setFileSize(originalFile.length());

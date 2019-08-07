@@ -7,15 +7,13 @@ public class RegenerationInfo {
 
     List<Placement> placementList = new ArrayList<>();
 
-    public long getFileSize() {
-        return fileSize;
-    }
 
-    public void setFileSize(long fileSize) {
-        this.fileSize = fileSize;
-    }
+
+    private String fileName;
 
     private long fileSize;
+
+    private String key;
 
     public int getBytesOfPart() {
         return bytesOfPart;
@@ -36,8 +34,6 @@ public class RegenerationInfo {
         this.fileName = fileName;
     }
 
-    private String fileName;
-
     public List<Placement> getPlacementList() {
         return placementList;
     }
@@ -46,7 +42,19 @@ public class RegenerationInfo {
         this.placementList = placementList;
     }
 
+    public long getFileSize() {
+        return fileSize;
+    }
 
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
 
+    public void setKey(String key) {
+        this.key = key;
+    }
 
+    public String getKey() {
+        return key;
+    }
 }

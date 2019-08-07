@@ -2,7 +2,9 @@ package com.fonkwill.fogstorage.client.service.impl;
 
 import com.fonkwill.fogstorage.client.client.FogStorageService;
 import com.fonkwill.fogstorage.client.domain.*;
+import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
 import com.fonkwill.fogstorage.client.service.exception.FileServiceException;
+import com.fonkwill.fogstorage.client.service.utils.Stopwatch;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -18,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class FileUploadService {
+public class FileUploadService extends  AbstractFileService {
 
 
     private FogStorageService fogStorageService;
@@ -80,6 +82,17 @@ public class FileUploadService {
 
 
     public ProcessingResult upload(byte[] content, UploadMode uploadMode) throws FileServiceException {
+        long encryptionTime = 0L;
+        if (encryptionActivated) {
+            try {
+                Stopwatch stopwatch = new Stopwatch();
+                content = encrypter.encrypt(content);
+                encryptionTime = stopwatch.stop();
+            } catch (EncryptionException e) {
+                throw new FileServiceException("Could not encrypt data");
+            }
+        }
+
         PlacementStrategy placementStrategy = uploadMode.getPlacementStrategy();
 
         RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), content);
@@ -100,6 +113,7 @@ public class FileUploadService {
 
         Placement placement = response.body();
         Measurement measurement = new Measurement(response.headers());
+        measurement.setEnDecryptionTime(encryptionTime);
 
         ProcessingResult result = new ProcessingResult();
         result.setMeasurement(measurement);

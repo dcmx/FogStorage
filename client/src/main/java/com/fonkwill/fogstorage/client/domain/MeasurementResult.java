@@ -12,6 +12,8 @@ public class MeasurementResult {
 
     private Long placementCalculationTime = 0L;
 
+    private Long enDecryptionTime = 0L;
+
     private Map<String, Long> allNodesTransferTime = new HashMap<>();
 
     public void addMeasurement(Measurement measurement) {
@@ -34,6 +36,8 @@ public class MeasurementResult {
                 allNodesTransferTime.put(nodesTime.getKey(), Long.valueOf(nodesTime.getValue()));
             }
         }
+
+        enDecryptionTime += measurement.getEnDecryptionTime();
     }
 
 
@@ -51,5 +55,9 @@ public class MeasurementResult {
 
     public Map<String, Long> getAllNodesTransferTime() {
         return  allNodesTransferTime;
+    }
+
+    public String getEnDecryptionTime() {
+        return enDecryptionTime.toString();
     }
 }

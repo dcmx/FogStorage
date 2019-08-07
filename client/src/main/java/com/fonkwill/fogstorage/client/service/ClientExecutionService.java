@@ -19,6 +19,7 @@ public class ClientExecutionService {
     private Option parityChunksCountOption = new Option("p", true, "Number of parity chunks (default: 1)");
     private Option hostOption = new Option("h", true, "Host");
     private Option splitOption = new Option("n", true, "Number of kilobytes for splitting up the file");
+    private Option encryptionOption = new Option("e", false, "AesEncryptionService enabled");
 
     private CommandLine cmd;
 
@@ -33,6 +34,7 @@ public class ClientExecutionService {
         options.addOption(hostOption);
         options.addOption(downloadOption);
         options.addOption(splitOption);
+        options.addOption(encryptionOption);
         CommandLineParser parser = new DefaultParser();
 
         try {
@@ -48,6 +50,7 @@ public class ClientExecutionService {
 
         this.fogStorageContext.setSplitMode(isInSplitMode());
         this.fogStorageContext.setCountBytesForSplit(getBytesCountForSplit());
+        this.fogStorageContext.setEncryptionMode(isInEcryptionMode());
     }
 
 
@@ -65,6 +68,10 @@ public class ClientExecutionService {
 
     public boolean isInSplitMode() {
         return cmd.hasOption(splitOption.getOpt());
+    }
+
+    public boolean isInEcryptionMode() {
+        return cmd.hasOption(encryptionOption.getOpt());
     }
 
 
