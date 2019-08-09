@@ -2,6 +2,9 @@ package com.fonkwill.fogstorage.client.service;
 
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class FogStorageContext {
     private String host;
@@ -10,6 +13,12 @@ public class FogStorageContext {
 
     private int countBytesForSplit;
     private boolean encryptionMode;
+
+    public List<String> getHosts() {
+        return hosts;
+    }
+
+    private List<String> hosts = new ArrayList<>();
 
     public String getHost() {
         return host;
@@ -41,5 +50,20 @@ public class FogStorageContext {
 
     public boolean isEncryptionMode() {
         return encryptionMode;
+    }
+
+    public void clearHosts() {
+        hosts.clear();
+    }
+
+    public void setHosts(String hosts) {
+        if (hosts.contains(",")) {
+            String[] hostsArray = hosts.split(",");
+            for (String host : hostsArray) {
+                this.hosts.add(host);
+            }
+        } else {
+            this.hosts.add(hosts);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.fonkwill.fogstorage.client.service.impl;
 
 import com.fonkwill.fogstorage.client.client.FogStorageService;
+import com.fonkwill.fogstorage.client.client.FogStorageServiceProvider;
 import com.fonkwill.fogstorage.client.domain.*;
 import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
 import com.fonkwill.fogstorage.client.service.exception.FileServiceException;
@@ -25,9 +26,10 @@ public class FileUploadService extends  AbstractFileService {
 
     private FogStorageService fogStorageService;
 
-    public FileUploadService(FogStorageService fogStorageService) {
-        this.fogStorageService = fogStorageService;
+    public FileUploadService(FogStorageServiceProvider fogStorageServiceProvider, List<String> hosts) {
+        super(fogStorageServiceProvider, hosts);
     }
+
 
     public List<ProcessingResult> uploadAsOne(Path toFile, UploadMode uploadMode) throws FileServiceException {
         byte[] content;

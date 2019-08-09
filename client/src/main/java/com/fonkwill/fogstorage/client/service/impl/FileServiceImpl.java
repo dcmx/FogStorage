@@ -1,6 +1,7 @@
 package com.fonkwill.fogstorage.client.service.impl;
 
 import com.fonkwill.fogstorage.client.client.FogStorageService;
+import com.fonkwill.fogstorage.client.client.FogStorageServiceProvider;
 import com.fonkwill.fogstorage.client.domain.*;
 import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
 import com.fonkwill.fogstorage.client.encryption.impl.AesDecryptionService;
@@ -36,46 +37,24 @@ public class FileServiceImpl implements FileService {
 
     protected FogStorageService fogStorageService;
 
+    private FogStorageServiceProvider fogStorageServiceProvider;
+
     private FileDownloadService fileDownloadService;
 
     private FileUploadService fileUploadService;
 
     private Retrofit retrofit;
 
-    public FileServiceImpl( PlacementRepository placementRepository, FogStorageContext fogStorageContext)  {
+    public FileServiceImpl(PlacementRepository placementRepository, FogStorageContext fogStorageContext, FogStorageServiceProvider fogStorageServiceProvider)  {
         this.placementRepository = placementRepository;
         this.fogStorageContext = fogStorageContext;
+        this.fogStorageServiceProvider = fogStorageServiceProvider;
     }
 
-    private void init() throws FileServiceException {
-        String host = fogStorageContext.getHost();
-        if (host == null) {
-            throw new FileServiceException("Couldn't get current host");
-        }
-        if (retrofit == null) {
-            OkHttpClient okHttpClient = new OkHttpClient().newBuilder().
-                    connectTimeout(50, TimeUnit.SECONDS).
-                    readTimeout(50, TimeUnit.SECONDS).
-                    writeTimeout(50, TimeUnit.SECONDS).
-                    build();
-            this.retrofit = new Retrofit.Builder()
-                    .baseUrl(host).addConverterFactory(GsonConverterFactory.create())
-                    .client(okHttpClient)
-                    .build();
-
-        }
-        if (this.fogStorageService == null || !this.retrofit.baseUrl().equals(host)) {
-            this.fogStorageService = this.retrofit.create(FogStorageService.class);
-
-            fileDownloadService = new FileDownloadService(fogStorageService);
-            fileUploadService = new FileUploadService(fogStorageService);
-
-        }
-    }
 
     @Override
     public MeasurementResult download(Path toPlacement) throws FileServiceException {
-        init();
+        fileDownloadService = new FileDownloadService(fogStorageServiceProvider, fogStorageContext.getHosts());
 
         RegenerationInfo placement = placementRepository.getPlacement(toPlacement);
         List<Placement> placementList = placement.getPlacementList();
@@ -107,7 +86,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public MeasurementResult upload(Path toFile, UploadMode uploadMode) throws FileServiceException {
-        init();
+        fileUploadService = new FileUploadService(fogStorageServiceProvider, fogStorageContext.getHosts());
 
         RegenerationInfo regenerationInfo = new RegenerationInfo();
 

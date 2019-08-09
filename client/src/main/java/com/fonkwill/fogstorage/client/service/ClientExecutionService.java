@@ -53,9 +53,10 @@ public class ClientExecutionService {
             throw new ClientServiceException("Could not parse arguments", e);
         }
 
+        fogStorageContext.clearHosts();
         if (cmd.hasOption(hostOption.getOpt())) {
             String host = cmd.getOptionValue(hostOption.getOpt());
-            fogStorageContext.setHost(host);
+            fogStorageContext.setHosts(host);
         }
 
         this.fogStorageContext.setSplitMode(isInSplitMode());

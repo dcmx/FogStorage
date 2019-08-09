@@ -1,9 +1,12 @@
 package com.fonkwill.fogstorage.client.service.impl;
 
+import com.fonkwill.fogstorage.client.client.FogStorageServiceProvider;
 import com.fonkwill.fogstorage.client.encryption.Decrypter;
 import com.fonkwill.fogstorage.client.encryption.Encrypter;
 import com.fonkwill.fogstorage.client.encryption.impl.AbstractAesService;
 import com.fonkwill.fogstorage.client.encryption.impl.AesEncryptionService;
+
+import java.util.List;
 
 public abstract class AbstractFileService {
 
@@ -12,6 +15,10 @@ public abstract class AbstractFileService {
     protected Encrypter encrypter;
 
     protected Decrypter decrypter;
+
+    protected  FogStorageServiceProvider fogStorageServiceProvider;
+
+    protected  List<String> hosts;
 
     public void enableEncryption() {
         this.encryptionActivated = true;
@@ -27,5 +34,10 @@ public abstract class AbstractFileService {
     
     public void setDecrypter(Decrypter decrypter) {
         this.decrypter = decrypter;
+    }
+
+    public AbstractFileService(FogStorageServiceProvider fogStorageServiceProvider, List<String> hosts) {
+        this.fogStorageServiceProvider = fogStorageServiceProvider;
+        this.hosts =  hosts;
     }
 }

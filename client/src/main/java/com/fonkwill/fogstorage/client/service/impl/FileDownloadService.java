@@ -1,6 +1,7 @@
 package com.fonkwill.fogstorage.client.service.impl;
 
 import com.fonkwill.fogstorage.client.client.FogStorageService;
+import com.fonkwill.fogstorage.client.client.FogStorageServiceProvider;
 import com.fonkwill.fogstorage.client.domain.*;
 import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
 import com.fonkwill.fogstorage.client.service.exception.FileServiceException;
@@ -25,13 +26,19 @@ public class FileDownloadService extends  AbstractFileService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileDownloadService.class);
 
-    private FogStorageService fogStorageService;
 
-    public FileDownloadService(FogStorageService fogStorageService) {
-        this.fogStorageService = fogStorageService;
+    public FileDownloadService(FogStorageServiceProvider fogStorageServiceProvider, List<String> hosts) {
+        super(fogStorageServiceProvider, hosts);
     }
 
     public Measurement download(Bytes bytes, Placement placement) throws FileServiceException {
+        FogStorageService fogStorageService;
+        if (hosts.size() > 1) {
+            fogStorageService = fogStorageServiceProvider.getServiceForPlacement(placement, hosts);
+        } else {
+            fogStorageService = fogStorageServiceProvider.getService(hosts.get(0));
+        }
+
 
         Call<ResponseBody> downloadCall = fogStorageService.download(placement);
 
