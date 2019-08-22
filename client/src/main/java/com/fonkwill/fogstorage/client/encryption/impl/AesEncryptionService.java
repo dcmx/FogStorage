@@ -39,6 +39,7 @@ public class AesEncryptionService  extends AbstractAesService implements Encrypt
     @Override
     public byte[] encrypt(byte[] content) throws EncryptionException {
         try {
+            Cipher cipher =  Cipher.getInstance(algorithmAndPadding);;
             IvParameterSpec ivParameterSpec = new IvParameterSpec(SecureRandom.getSeed(16));
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec );
 
@@ -51,6 +52,10 @@ public class AesEncryptionService  extends AbstractAesService implements Encrypt
 
         } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException e) {
             throw new EncryptionException("Could not encrypt data", e);
+        } catch (NoSuchPaddingException e) {
+            throw new EncryptionException("No such padding", e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new EncryptionException("No such algorithm", e);
         }
     }
 

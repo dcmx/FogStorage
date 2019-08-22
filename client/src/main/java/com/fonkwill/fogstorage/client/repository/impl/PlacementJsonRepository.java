@@ -43,7 +43,7 @@ public class PlacementJsonRepository implements PlacementRepository {
         }
         Gson gson = new Gson();
 
-        try(FileWriter fileWriter = new FileWriter(placementPath.toFile());) {
+        try(FileWriter fileWriter = new FileWriter(placementPath.toFile())) {
 
             gson.toJson(placement, fileWriter);
         } catch (IOException e) {

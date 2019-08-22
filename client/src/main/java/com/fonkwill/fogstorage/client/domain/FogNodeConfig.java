@@ -2,15 +2,15 @@ package com.fonkwill.fogstorage.client.domain;
 
 import java.util.Set;
 
-public class NodesPublicConfig {
+public class FogNodeConfig {
 
-    private Set<NodePublicInfo> nodes;
+    private Set<FogNode> nodes;
 
-    public Set<NodePublicInfo> getNodes() {
+    public Set<FogNode> getNodes() {
         return nodes;
     }
 
-    public void setNodes(Set<NodePublicInfo> nodes) {
+    public void setNodes(Set<FogNode> nodes) {
         this.nodes = nodes;
     }
 

@@ -1,17 +1,12 @@
 package com.fonkwill.fogstorage.client;
 
-import com.fonkwill.fogstorage.client.configuration.ApplicationProperties;
-import com.fonkwill.fogstorage.client.domain.Measurement;
+import com.fonkwill.fogstorage.client.config.ApplicationProperties;
 import com.fonkwill.fogstorage.client.domain.MeasurementResult;
-import com.fonkwill.fogstorage.client.domain.PlacementStrategy;
-import com.fonkwill.fogstorage.client.domain.UploadMode;
 import com.fonkwill.fogstorage.client.service.ClientExecutionService;
 import com.fonkwill.fogstorage.client.service.FileService;
 import com.fonkwill.fogstorage.client.service.FogStorageContext;
 import com.fonkwill.fogstorage.client.service.exception.ClientServiceException;
-import com.fonkwill.fogstorage.client.service.exception.FileServiceException;
 import com.fonkwill.fogstorage.scenario.ScenarioRunner;
-import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +15,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.Security;
 import java.util.Map;
 
 
@@ -44,23 +36,39 @@ public class ClientApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+	    if (args.length == 0) {
+	        return;
+        }
 
         ClientExecutionService executionService = null;
 	    try {
             executionService = new ClientExecutionService(args, fogStorageContext, fileService);
         } catch (ClientServiceException e) {
-	        System.err.println(e.getMessage() + e.getCause().getMessage());
+	        logger.error(e.getMessage() + e.getCause().getMessage());
 	        return;
         }
 
 	    if (executionService.isScenarioMode()) {
 	        new ScenarioRunner(fogStorageContext, fileService, executionService.getScenarioFile());
         } else {
-            executionService.execute();
+            MeasurementResult result  = executionService.execute();
+            logMeasurements(result);
         }
     }
 
-
+    private void logMeasurements(MeasurementResult measurement) {
+	    logger.info("Total time {}", measurement.getTotalTime() );
+	    for (Map.Entry<String, Long> entry : measurement.getThroughFogNodesTotalTime().entrySet()) {
+	        logger.info("Total transfer time through fog node {} : {}", entry.getKey(), entry.getValue());
+        }
+        logger.info("EnDecryption time: {} ", measurement.getEnDecryptionTime());
+        logger.info("Coding time: {}", measurement.getCodingTime());
+        logger.info("Total transfer time from fog node: {}", measurement.getFromFogTotalTransferTime());
+        logger.info("Placement calculation time : {}", measurement.getPlacementCalculationTime());
+        for (Map.Entry<String, Long> entry : measurement.getNodesFromFogTransferTime().entrySet()) {
+            logger.info("Transfer time from fog for {} : {}", entry.getKey(), entry.getValue());
+        }
+    }
 
 
 }

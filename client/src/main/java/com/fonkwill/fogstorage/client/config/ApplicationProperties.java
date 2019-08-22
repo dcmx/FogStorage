@@ -1,4 +1,4 @@
-package com.fonkwill.fogstorage.client.configuration;
+package com.fonkwill.fogstorage.client.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

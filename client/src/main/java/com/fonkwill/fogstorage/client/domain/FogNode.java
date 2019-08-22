@@ -3,7 +3,7 @@ package com.fonkwill.fogstorage.client.domain;
 
 import java.util.Objects;
 
-public class NodePublicInfo {
+public class FogNode {
 
     private String name;
 
@@ -26,12 +26,12 @@ public class NodePublicInfo {
         this.url = url;
     }
 
-    public NodePublicInfo name(String name) {
+    public FogNode name(String name) {
         this.name = name;
         return this;
     }
 
-    public NodePublicInfo url(String url) {
+    public FogNode url(String url) {
         this.url = url;
         return this;
     }
@@ -41,7 +41,7 @@ public class NodePublicInfo {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NodePublicInfo that = (NodePublicInfo) o;
+        FogNode that = (FogNode) o;
         return Objects.equals(name, that.name);
     }
 

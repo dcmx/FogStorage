@@ -1,83 +1,108 @@
 package com.fonkwill.fogstorage.client.client;
 
-import com.fonkwill.fogstorage.client.domain.Node;
 import com.fonkwill.fogstorage.client.domain.Placement;
-import com.fonkwill.fogstorage.client.service.FogStorageContext;
-import com.fonkwill.fogstorage.client.service.exception.FileServiceException;
-import com.fonkwill.fogstorage.client.service.impl.FileDownloadService;
-import com.fonkwill.fogstorage.client.service.impl.FileUploadService;
-import okhttp3.OkHttpClient;
-import org.springframework.stereotype.Component;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
-@Component
+
 public class FogStorageServiceProvider {
 
-    Map<String, FogStorageService> serviceMap = new ConcurrentHashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(FogStorageServiceProvider.class);
 
-    Map<String, Integer> usedMap = new ConcurrentHashMap<>();
+    private final FogStorageServiceFactory fogstorageServiceFactory;
 
-    public FogStorageService getService(String host) {
-        usedMap.putIfAbsent(host, 0);
-        usedMap.computeIfPresent(host, (k, v) -> v = v+1 );
+    private FogStorageServiceHost onlyService;
 
-        FogStorageService service = serviceMap.get(host);
-        if (service != null) {
-            return service;
+    private final List<String> hosts;
+
+    private Set<String> invalid = new HashSet<>();
+
+    private LinkedBlockingQueue<FogStorageServiceHost> availableServices = new LinkedBlockingQueue<>();
+
+    public FogStorageServiceProvider(FogStorageServiceFactory fogStorageServiceFactory, List<String> hosts) {
+        this.fogstorageServiceFactory = fogStorageServiceFactory;
+        this.hosts = hosts;
+        init();
+    }
+
+    public Integer getNumberOfavailableServices() {
+        if (hosts.size() == 1) {
+            return 1;
         }
-        OkHttpClient okHttpClient = new OkHttpClient().newBuilder().
-                connectTimeout(50, TimeUnit.SECONDS).
-                readTimeout(50, TimeUnit.SECONDS).
-                writeTimeout(50, TimeUnit.SECONDS).
-                build();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(host).addConverterFactory(GsonConverterFactory.create())
-                .client(okHttpClient)
-                .build();
-        service = retrofit.create(FogStorageService.class);
-        serviceMap.put(host, service);
+        return this.availableServices.size();
+    }
+
+    private void init() {
+        if (hosts.size() == 1) {
+            onlyService = new FogStorageServiceHost(fogstorageServiceFactory.getService(hosts.get(0)), hosts.get(0));
+        } else {
+            for (String host : hosts) {
+                FogStorageServiceHost fogStorageServiceHost = new FogStorageServiceHost(fogstorageServiceFactory.getService(host), host);
+                availableServices.add(fogStorageServiceHost);
+            }
+        }
+    }
+
+    public FogStorageServiceHost getService() {
+        if (onlyService != null) {
+            if (invalid.contains(hosts.get(0))) {
+                return null;
+            }
+            return onlyService;
+        }
+        FogStorageServiceHost service  = null;
+        try {
+            service = availableServices.take();
+        } catch (InterruptedException e) {
+            logger.error("Interrupted Excepiton");
+            return null;
+        }
+        availableServices.add(service);
         return service;
     }
 
-    public FogStorageService getServiceForPlacement(Placement placement, List<String> hosts) {
-        List<Placement.Assignment> assignmentList = placement.getStoredAtList();
-        FogStorageService fogStorageService;
-        for (Placement.Assignment assignment : assignmentList) {
-            Node node = assignment.getNode();
-            for (String host : hosts) {
-                if (node.getUrl().startsWith(host)) {
-                    return  getService(host);
-                }
+    public FogStorageServiceHost getServiceForPlacement(Placement placement) {
+        if (onlyService != null) {
+            if (invalid.contains(hosts.get(0))) {
+                return null;
             }
-
+            return onlyService;
         }
-        String hostToUse = getLeastUsedHost();
-        if (hostToUse == null) {
-            hostToUse = hosts.get(0);
-        }
-        return serviceMap.get(hostToUse);
-
-    }
-
-    private String getLeastUsedHost() {
-        return usedMap.entrySet().stream()
-                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+        String preferredHost = placement.getStoredAtList().stream()
+                .map(a -> a.getNode().getName())
+                .filter(hosts::contains)
                 .findFirst()
-                .orElse(null)
-                .getKey();
+                .orElse(null);
 
+        if (preferredHost != null && !invalid.contains(preferredHost)) {
+            return new FogStorageServiceHost(fogstorageServiceFactory.getService(preferredHost), preferredHost);
+        } else {
+            return getService();
+        }
 
     }
 
-    public void clearUsedStatistic() {
-        usedMap.clear();
+    public void markAsInvalid(FogStorageServiceHost fogStorageService) {
+        FogStorageServiceHost fromAvailable = availableServices.stream()
+                .filter(fh -> fh.getHost().equals(fogStorageService.getHost()))
+                .findFirst()
+                .orElse(null);
+
+        if (fromAvailable == null) {
+            //not available
+            return;
+        }
+        logger.info("Marked invalid fogstorageSerivce {}", fromAvailable.getHost());
+        invalid.add(fromAvailable.getHost());
+        availableServices.remove(fromAvailable);
     }
+
+    public List<String> getHosts() {
+        return hosts;
+    }
+
 }

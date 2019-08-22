@@ -19,4 +19,5 @@ public interface FogStorageService {
     @POST("/services/middleware/api/files/download")
     Call<ResponseBody> download(@Body Placement placement);
 
+
 }

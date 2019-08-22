@@ -1,5 +1,7 @@
 package com.fonkwill.fogstorage.client.domain;
 
+import java.util.Arrays;
+
 public class Bytes {
 
 
@@ -11,5 +13,12 @@ public class Bytes {
 
     public void setContent(byte[] content) {
         this.content = content;
+    }
+
+    public Bytes copy() {
+        byte[] newContent =  Arrays.copyOf(this.content, content.length);
+        Bytes newBytes = new Bytes();
+        newBytes.setContent(newContent);
+        return newBytes;
     }
 }

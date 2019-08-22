@@ -1,3 +1,6 @@
 application:
   client-name: "CLIENT_1"
   fog-nodes-config-file: "classpath:config/fogNodesConfig.json"
+
+application-test:
+  fog-url: ""

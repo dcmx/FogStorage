@@ -40,6 +40,7 @@ public class AesDecryptionService extends AbstractAesService implements Decrypte
     @Override
     public byte[] decrypt(byte[] content) throws EncryptionException {
         try {
+            Cipher cipher =  Cipher.getInstance(algorithmAndPadding);;
             ByteBuffer byteBuffer = ByteBuffer.wrap(content);
             byte[] iv = new byte[16];
             byteBuffer.get(iv, 0, 16);
@@ -52,6 +53,10 @@ public class AesDecryptionService extends AbstractAesService implements Decrypte
             return cipher.doFinal(result);
         } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException e) {
             throw new EncryptionException("Could not decrypt data", e);
+        } catch (NoSuchPaddingException e) {
+            throw new EncryptionException("No such padding exception", e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new EncryptionException("Not such algorithm", e);
         }
     }
 }

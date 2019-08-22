@@ -1,6 +1,7 @@
 package com.fonkwill.fogstorage.client.service.impl;
 
 import com.fonkwill.fogstorage.client.client.FogStorageService;
+import com.fonkwill.fogstorage.client.client.FogStorageServiceFactory;
 import com.fonkwill.fogstorage.client.client.FogStorageServiceProvider;
 import com.fonkwill.fogstorage.client.domain.*;
 import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
@@ -10,9 +11,11 @@ import com.fonkwill.fogstorage.client.repository.PlacementRepository;
 import com.fonkwill.fogstorage.client.service.FileService;
 import com.fonkwill.fogstorage.client.service.FogStorageContext;
 import com.fonkwill.fogstorage.client.service.exception.FileServiceException;
+import com.fonkwill.fogstorage.client.service.utils.Stopwatch;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -37,7 +40,7 @@ public class FileServiceImpl implements FileService {
 
     protected FogStorageService fogStorageService;
 
-    private FogStorageServiceProvider fogStorageServiceProvider;
+    private FogStorageServiceFactory fogStorageServiceFactory;
 
     private FileDownloadService fileDownloadService;
 
@@ -45,16 +48,23 @@ public class FileServiceImpl implements FileService {
 
     private Retrofit retrofit;
 
-    public FileServiceImpl(PlacementRepository placementRepository, FogStorageContext fogStorageContext, FogStorageServiceProvider fogStorageServiceProvider)  {
+    private TaskExecutor taskExecutor;
+
+    public FileServiceImpl(PlacementRepository placementRepository, FogStorageContext fogStorageContext, FogStorageServiceFactory fogStorageServiceFactory, TaskExecutor taskExecutor)  {
         this.placementRepository = placementRepository;
         this.fogStorageContext = fogStorageContext;
-        this.fogStorageServiceProvider = fogStorageServiceProvider;
+        this.fogStorageServiceFactory = fogStorageServiceFactory;
+        this.taskExecutor = taskExecutor;
     }
 
 
     @Override
     public MeasurementResult download(Path toPlacement) throws FileServiceException {
-        fileDownloadService = new FileDownloadService(fogStorageServiceProvider, fogStorageContext.getHosts());
+        logger.info("Starting to download");
+        Stopwatch stopwatch = new Stopwatch();
+
+        FogStorageServiceProvider fogStorageServiceProvider = new FogStorageServiceProvider(fogStorageServiceFactory, fogStorageContext.getHosts());
+        fileDownloadService = new FileDownloadService(fogStorageServiceProvider, taskExecutor);
 
         RegenerationInfo placement = placementRepository.getPlacement(toPlacement);
         List<Placement> placementList = placement.getPlacementList();
@@ -75,18 +85,26 @@ public class FileServiceImpl implements FileService {
         Path targetDirectory = toPlacement.getParent();
         Path targetFilePath = Paths.get(targetDirectory.toString(), placement.getFileName());
 
+        MeasurementResult measurementResult;
         if (placementList.size() == 1) {
-            return fileDownloadService.downloadAsOne(placement, targetFilePath);
+            measurementResult = fileDownloadService.downloadAsOne(placement, targetFilePath);
         } else {
-            return fileDownloadService.downloadInParts(placement, placementList, targetFilePath);
+            measurementResult = fileDownloadService.downloadInParts(placement, placementList, targetFilePath);
         }
+        measurementResult.setTotalTime(stopwatch.stop());
+        logger.info("Finished downloading");
+        return measurementResult;
 
     }
 
 
     @Override
     public MeasurementResult upload(Path toFile, UploadMode uploadMode) throws FileServiceException {
-        fileUploadService = new FileUploadService(fogStorageServiceProvider, fogStorageContext.getHosts());
+        logger.info("Starting to upload");
+        Stopwatch stopwatch = new Stopwatch();
+
+        FogStorageServiceProvider fogStorageServiceProvider = new FogStorageServiceProvider(fogStorageServiceFactory, fogStorageContext.getHosts());
+        fileUploadService = new FileUploadService(fogStorageServiceProvider, taskExecutor);
 
         RegenerationInfo regenerationInfo = new RegenerationInfo();
 
@@ -139,6 +157,8 @@ public class FileServiceImpl implements FileService {
 
         placementRepository.savePlacement(targetPlacementFilePath,  regenerationInfo);
 
+        measurementResult.setTotalTime(stopwatch.stop());
+        logger.info("Finished uploading");
         return measurementResult;
 
     }

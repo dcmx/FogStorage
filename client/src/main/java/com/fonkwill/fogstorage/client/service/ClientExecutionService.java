@@ -155,7 +155,7 @@ public class ClientExecutionService {
         return cmd.hasOption(scenarioOption.getOpt());
     }
 
-    public void execute() {
+    public MeasurementResult execute() {
         if (isUploadMode()) {
 
             String file = getFile();
@@ -168,9 +168,8 @@ public class ClientExecutionService {
                 measurement = fileService.upload(path, uploadMode);
             } catch (FileServiceException e) {
                 logger.error("Could not upload file", e);
-                return;
             }
-            logMeasurements(measurement);
+            return measurement;
 
         } else if(isDownloadMode()) {
             String file = getFile();
@@ -181,19 +180,11 @@ public class ClientExecutionService {
                 measurementResult = fileService.download(path);
             } catch (FileServiceException e) {
                 logger.error("Could not download file", e);
-                return;
             }
-            logMeasurements(measurementResult);
+            return measurementResult;
         }
+        return null;
     }
 
-    private void logMeasurements(MeasurementResult measurement) {
-        logger.info("EnDecryption time: {} ", measurement.getEnDecryptionTime());
-        logger.info("Coding time: {}", measurement.getCodingTime());
-        logger.info("Total transfer time: {}", measurement.getTotalTransferTime());
-        logger.info("Placement calculation time : {}", measurement.getPlacementCalculationTime());
-        for (Map.Entry<String, Long> entry : measurement.getAllNodesTransferTime().entrySet()) {
-            logger.info("Transfer time for {} : {}", entry.getKey(), entry.getValue());
-        }
-    }
+
 }

@@ -1,67 +1,57 @@
 package com.fonkwill.fogstorage.client.repository.impl;
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+;
 import com.fonkwill.fogstorage.client.config.ApplicationProperties;
-import com.fonkwill.fogstorage.client.domain.NodePublicInfo;
-import com.fonkwill.fogstorage.client.domain.NodesPublicConfig;
-import com.fonkwill.fogstorage.client.repository.NodePublicInfoRepository;
+import com.fonkwill.fogstorage.client.domain.FogNode;
+import com.fonkwill.fogstorage.client.domain.FogNodeConfig;
+import com.fonkwill.fogstorage.client.repository.FogNodeRepository;
+import com.fonkwill.fogstorage.client.service.exception.FileServiceException;
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Set;
 
 @Component
-public class NodePublicInfoJsonRepositoryImpl implements NodePublicInfoRepository {
+public class FogNodeJsonRepositoryImpl implements FogNodeRepository {
 
-    private static Logger logger = LoggerFactory.getLogger(NodePublicInfoJsonRepositoryImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(FogNodeJsonRepositoryImpl.class);
 
-    public NodePublicInfoJsonRepositoryImpl(ApplicationProperties properties, ResourceLoader resourceLoader, ObjectMapper objectMapper) {
+    public FogNodeJsonRepositoryImpl(ApplicationProperties properties, ResourceLoader resourceLoader) {
         this.properties = properties;
         this.resourceLoader = resourceLoader;
-        this.objectMapper = objectMapper;
     }
 
     private ApplicationProperties properties;
 
     private ResourceLoader resourceLoader;
 
-    private ObjectMapper objectMapper;
 
 
     @Override
-    public Set<NodePublicInfo> getAll() {
-        NodesPublicConfig nodesPublicConfig = initConfig();
-        if (nodesPublicConfig == null) {
+    public Set<FogNode> getAll() throws FileServiceException {
+        FogNodeConfig fogNodeConfig = initConfig();
+        if (fogNodeConfig == null) {
             return null;
         }
-        return nodesPublicConfig.getNodes();
+        return fogNodeConfig.getNodes();
     }
 
-    private NodesPublicConfig initConfig() {
+    private FogNodeConfig initConfig() throws FileServiceException {
         Resource configFile = resourceLoader.getResource(properties.getFogNodesConfigFile());
-        InputStream configFileIs = null;
-        NodesPublicConfig nodesPublicConfig = null;
-        try {
-            configFileIs = configFile.getInputStream();
-            objectMapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
-            nodesPublicConfig = objectMapper.readValue(configFileIs, NodesPublicConfig.class);
+
+        FogNodeConfig fogNodeConfig;
+        Gson gson = new Gson();
+        try (FileReader fileReader = new FileReader(configFile.getFile())){
+            fogNodeConfig = gson.fromJson(fileReader, FogNodeConfig.class);
         } catch (IOException e) {
-            logger.error("Could not load fog-node-info file", e);
-        } finally {
-            if (configFileIs != null) {
-                try {
-                    configFileIs.close();
-                } catch (IOException e) {
-                    //do nothing
-                }
-            }
+            throw new FileServiceException("Could not read in nodes config file!");
         }
-        return nodesPublicConfig;
+        return fogNodeConfig;
     }
 }

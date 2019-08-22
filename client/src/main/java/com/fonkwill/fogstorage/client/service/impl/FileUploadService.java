@@ -1,6 +1,6 @@
 package com.fonkwill.fogstorage.client.service.impl;
 
-import com.fonkwill.fogstorage.client.client.FogStorageService;
+import com.fonkwill.fogstorage.client.client.FogStorageServiceHost;
 import com.fonkwill.fogstorage.client.client.FogStorageServiceProvider;
 import com.fonkwill.fogstorage.client.domain.*;
 import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
@@ -9,7 +9,9 @@ import com.fonkwill.fogstorage.client.service.utils.Stopwatch;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.task.TaskExecutor;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -19,15 +21,20 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.*;
 
 
 public class FileUploadService extends  AbstractFileService {
 
+    private static final Logger logger = LoggerFactory.getLogger(FileUploadService.class);
 
-    private FogStorageService fogStorageService;
+    private Map<Integer, ProcessingResult> processingResultMap = new ConcurrentHashMap<>();
 
-    public FileUploadService(FogStorageServiceProvider fogStorageServiceProvider, List<String> hosts) {
-        super(fogStorageServiceProvider, hosts);
+
+
+    public FileUploadService(FogStorageServiceProvider fogStorageServiceProvider, TaskExecutor taskExecutor) {
+        super(fogStorageServiceProvider, taskExecutor);
     }
 
 
@@ -60,24 +67,45 @@ public class FileUploadService extends  AbstractFileService {
 
         byte[] content = new byte[bytesForSplit];
 
+        Phaser phaser = new Phaser(1);
         try (InputStream is =  new FileInputStream(originalFile)) {
             boolean stop = false;
+            int i = 0;
             while (!stop) {
                 int bytesRead = is.read(content, 0, content.length);
+                if (bytesRead == -1) {
+                    break;
+                }
                 if  (bytesRead < bytesForSplit) {
                     byte[] endContent = Arrays.copyOf(content, bytesRead);
                     content = endContent;
                     stop = true;
                 }
-                uploadResult = upload(content, uploadMode);
-                processingList.add(uploadResult);
+
+                transferThreads.put(i);
+                //one execution
+                phaser.register();
+                processingList.add(null);
+                UploadTask uploadTask = new UploadTask(content, uploadMode,phaser, i);
+                taskExecutor.execute(uploadTask);
+                i++;
+              //  ProcessingResult processingResult = upload(content, uploadMode);
+               // processingList.add(processingResult);
+
             }
         } catch (FileNotFoundException e) {
             throw new FileServiceException("File could not be found", e);
         } catch (IOException e) {
             throw new FileServiceException("File could not be handled", e);
+        } catch (InterruptedException e) {
+            logger.error("Upload was interrupted", e);
         }
 
+        phaser.arriveAndAwaitAdvance();
+
+        for (Map.Entry<Integer, ProcessingResult> entry : processingResultMap.entrySet()) {
+           processingList.set(entry.getKey(), entry.getValue());
+        }
         return processingList;
 
     }
@@ -100,22 +128,45 @@ public class FileUploadService extends  AbstractFileService {
         RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), content);
         MultipartBody.Part requestBody = MultipartBody.Part.createFormData("uploadFile", "uploadFile", requestFile);
 
-        Call<Placement> uploadCall = fogStorageService.upload(requestBody, placementStrategy.isUseFogAsStorage(), placementStrategy.getDataChunksCount(), placementStrategy.getParityChunksCount());
+        FogStorageServiceHost fogStorageService = fogStorageServiceProvider.getService();
 
-        Response<Placement> response = null;
-        try {
-            response = uploadCall.execute();
-        } catch (IOException e) {
-            throw new FileServiceException("Could not execute upload call successfully.", e);
-        }
-        if (!response.isSuccessful()) {
-            String error = "Got error at uploading, error-code" + response.code();
-            throw new FileServiceException(error );
+        Placement placement = null;
+        Measurement measurement = null;
+
+        boolean successful = false;
+        Long throughFogNodeTotalTime = null;
+        while (fogStorageService!=null && !successful){
+            Call<Placement> uploadCall = fogStorageService.getFogStorageService().upload(requestBody, placementStrategy.isUseFogAsStorage(), placementStrategy.getDataChunksCount(), placementStrategy.getParityChunksCount());
+
+            Response<Placement> response = null;
+            try {
+                Stopwatch stopwatch = new Stopwatch();
+                response = uploadCall.execute();
+                throughFogNodeTotalTime = stopwatch.stop();
+            } catch (IOException e) {
+                logger.error("Could not execute upload call successfully.", e);
+                fogStorageServiceProvider.markAsInvalid(fogStorageService);
+                fogStorageService = fogStorageServiceProvider.getService();
+                continue;
+            }
+            if (!response.isSuccessful()) {
+                logger.error("Got error at uploading, error-code {}", response.code());
+                fogStorageServiceProvider.markAsInvalid(fogStorageService);
+                fogStorageService = fogStorageServiceProvider.getService();
+                continue;
+            }
+            successful = true;
+
+            placement = response.body();
+            measurement = new Measurement(response.headers());
         }
 
-        Placement placement = response.body();
-        Measurement measurement = new Measurement(response.headers());
+        if (!successful) {
+            throw new FileServiceException("Could not upload part correctly");
+        }
+
         measurement.setEnDecryptionTime(encryptionTime);
+        measurement.setThroughFogNodeTotalTime(fogStorageService.getHost(), throughFogNodeTotalTime);
 
         ProcessingResult result = new ProcessingResult();
         result.setMeasurement(measurement);
@@ -123,6 +174,37 @@ public class FileUploadService extends  AbstractFileService {
 
         return result;
 
+    }
+
+    private class UploadTask implements Runnable {
+
+        private final int index;
+
+        private byte[] content;
+
+        private UploadMode uploadMode;
+
+        private Phaser phaser;
+
+
+        public UploadTask(byte[] content, UploadMode uploadMode, Phaser phaser, int index) {
+            this.content = Arrays.copyOf(content, content.length);
+            this.uploadMode = uploadMode;
+            this.phaser = phaser;
+            this.index = index;
+        }
+
+        @Override
+        public void run() {
+            try {
+              ProcessingResult processingResult =  upload(content, uploadMode);
+              processingResultMap.put(index, processingResult);
+            } catch (FileServiceException e) {
+                logger.error("Could not upload File", e);
+            }
+            transferThreads.poll();
+            this.phaser.arriveAndDeregister();
+        }
     }
 
 
