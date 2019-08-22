@@ -1,0 +1,40 @@
+{
+  "nodes": [
+    {
+      "name": "AWS_Frankfurt",
+      "type": "AWS",
+      "url": "https://fogstorage-frankfurt.s3.eu-central-1.amazonaws.com/"
+    },
+    {
+      "name": "AWS_Tokio",
+      "type": "AWS",
+      "url": "https://fogstorage-tokio.s3-ap-northeast-1.amazonaws.com/"
+    },
+    {
+      "name": "AWS_Oregon",
+      "type": "AWS",
+      "url": "https://fogstorage-oregon.s3-us-west-2.amazonaws.com/"
+    },
+    {
+      "name": "GCP_EU",
+      "type": "GCP",
+      "url": "https://storage.cloud.google.com/fogstorage-eu/"
+    },
+    {
+      "name": "GCP_Iowa",
+      "type": "GCP",
+      "url": "https://storage.cloud.google.com/fogstorage_iowa/"
+    },
+    {
+      "name": "GCP_Oregon",
+      "type": "GCP",
+      "url": "https://storage.cloud.google.com/fogstorage-oregon/"
+    },
+    {
+      "name": "FOG_1",
+      "type": "FOG",
+      "url": "http://172.24.160.1:8081/services/middleware/"
+    }
+
+  ]
+}
