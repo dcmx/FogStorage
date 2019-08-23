@@ -1,4 +1,4 @@
-package com.fonkwill.fogstorage.client.domain;
+package com.fonkwill.fogstorage.client.client.vm;
 
 
 /**

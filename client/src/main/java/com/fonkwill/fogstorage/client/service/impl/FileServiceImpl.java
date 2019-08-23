@@ -1,6 +1,6 @@
 package com.fonkwill.fogstorage.client.service.impl;
 
-import com.fonkwill.fogstorage.client.client.FogStorageService;
+import com.fonkwill.fogstorage.client.client.FogStorageFileService;
 import com.fonkwill.fogstorage.client.client.FogStorageServiceFactory;
 import com.fonkwill.fogstorage.client.client.FogStorageServiceProvider;
 import com.fonkwill.fogstorage.client.domain.*;
@@ -8,25 +8,20 @@ import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
 import com.fonkwill.fogstorage.client.encryption.impl.AesDecryptionService;
 import com.fonkwill.fogstorage.client.encryption.impl.AesEncryptionService;
 import com.fonkwill.fogstorage.client.repository.PlacementRepository;
+import com.fonkwill.fogstorage.client.security.EnDeCryptionService;
 import com.fonkwill.fogstorage.client.service.FileService;
 import com.fonkwill.fogstorage.client.service.FogStorageContext;
 import com.fonkwill.fogstorage.client.service.exception.FileServiceException;
 import com.fonkwill.fogstorage.client.service.utils.Stopwatch;
-import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
-import retrofit2.Call;
-import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.*;
-import java.nio.ByteBuffer;
 import java.nio.file.*;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Component
 public class FileServiceImpl implements FileService {
@@ -38,7 +33,7 @@ public class FileServiceImpl implements FileService {
 
     private FogStorageContext fogStorageContext;
 
-    protected FogStorageService fogStorageService;
+    protected FogStorageFileService fogStorageFileService;
 
     private FogStorageServiceFactory fogStorageServiceFactory;
 
@@ -50,11 +45,14 @@ public class FileServiceImpl implements FileService {
 
     private TaskExecutor taskExecutor;
 
-    public FileServiceImpl(PlacementRepository placementRepository, FogStorageContext fogStorageContext, FogStorageServiceFactory fogStorageServiceFactory, TaskExecutor taskExecutor)  {
+    private EnDeCryptionService enDeCryptionService;
+
+    public FileServiceImpl(PlacementRepository placementRepository, FogStorageContext fogStorageContext, FogStorageServiceFactory fogStorageServiceFactory, TaskExecutor taskExecutor, EnDeCryptionService enDeCryptionService)  {
         this.placementRepository = placementRepository;
         this.fogStorageContext = fogStorageContext;
         this.fogStorageServiceFactory = fogStorageServiceFactory;
         this.taskExecutor = taskExecutor;
+        this.enDeCryptionService = enDeCryptionService;
     }
 
 
@@ -64,7 +62,7 @@ public class FileServiceImpl implements FileService {
         Stopwatch stopwatch = new Stopwatch();
 
         FogStorageServiceProvider fogStorageServiceProvider = new FogStorageServiceProvider(fogStorageServiceFactory, fogStorageContext.getHosts());
-        fileDownloadService = new FileDownloadService(fogStorageServiceProvider, taskExecutor);
+        fileDownloadService = new FileDownloadService(fogStorageServiceProvider, taskExecutor, enDeCryptionService);
 
         RegenerationInfo placement = placementRepository.getPlacement(toPlacement);
         List<Placement> placementList = placement.getPlacementList();
@@ -104,7 +102,7 @@ public class FileServiceImpl implements FileService {
         Stopwatch stopwatch = new Stopwatch();
 
         FogStorageServiceProvider fogStorageServiceProvider = new FogStorageServiceProvider(fogStorageServiceFactory, fogStorageContext.getHosts());
-        fileUploadService = new FileUploadService(fogStorageServiceProvider, taskExecutor);
+        fileUploadService = new FileUploadService(fogStorageServiceProvider, enDeCryptionService, taskExecutor);
 
         RegenerationInfo regenerationInfo = new RegenerationInfo();
 

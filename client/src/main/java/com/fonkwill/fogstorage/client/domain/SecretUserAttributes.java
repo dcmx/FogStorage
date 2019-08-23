@@ -1,4 +1,4 @@
-package com.fonkwill.fogstorage.middleware.shared.security.domain;
+package com.fonkwill.fogstorage.client.domain;
 
 public class SecretUserAttributes {
 

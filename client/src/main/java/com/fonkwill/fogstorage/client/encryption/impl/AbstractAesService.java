@@ -3,13 +3,11 @@ package com.fonkwill.fogstorage.client.encryption.impl;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-public class AbstractAesService {
+public abstract  class AbstractAesService {
 
-    protected static final int keyLengthBit = 128;
-    protected static final String algorithm = "AES";
-    protected static final String algorithmAndPadding = "AES/CBC/PKCS5Padding";
-
-    protected Cipher cipher;
+    public static final int keyLengthBit = 256;
+    public static final String algorithm = "AES";
+    public final String algorithmAndPadding = "AES/CBC/PKCS5Padding";
 
     protected String key;
 

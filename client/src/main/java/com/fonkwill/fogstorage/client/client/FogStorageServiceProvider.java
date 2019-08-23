@@ -1,6 +1,9 @@
 package com.fonkwill.fogstorage.client.client;
 
 import com.fonkwill.fogstorage.client.domain.Placement;
+import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
+import com.fonkwill.fogstorage.client.encryption.impl.AbstractAesService;
+import com.fonkwill.fogstorage.client.encryption.utils.EncryptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,10 +41,11 @@ public class FogStorageServiceProvider {
 
     private void init() {
         if (hosts.size() == 1) {
-            onlyService = new FogStorageServiceHost(fogstorageServiceFactory.getService(hosts.get(0)), hosts.get(0));
+            onlyService = fogstorageServiceFactory.getService(hosts.get(0));
         } else {
             for (String host : hosts) {
-                FogStorageServiceHost fogStorageServiceHost = new FogStorageServiceHost(fogstorageServiceFactory.getService(host), host);
+
+                FogStorageServiceHost fogStorageServiceHost = fogstorageServiceFactory.getService(host);
                 availableServices.add(fogStorageServiceHost);
             }
         }
@@ -58,7 +62,7 @@ public class FogStorageServiceProvider {
         try {
             service = availableServices.take();
         } catch (InterruptedException e) {
-            logger.error("Interrupted Excepiton");
+            logger.error("Interrupted Exception");
             return null;
         }
         availableServices.add(service);
@@ -79,7 +83,7 @@ public class FogStorageServiceProvider {
                 .orElse(null);
 
         if (preferredHost != null && !invalid.contains(preferredHost)) {
-            return new FogStorageServiceHost(fogstorageServiceFactory.getService(preferredHost), preferredHost);
+            return fogstorageServiceFactory.getService(preferredHost);
         } else {
             return getService();
         }
@@ -87,11 +91,15 @@ public class FogStorageServiceProvider {
     }
 
     public void markAsInvalid(FogStorageServiceHost fogStorageService) {
-        FogStorageServiceHost fromAvailable = availableServices.stream()
-                .filter(fh -> fh.getHost().equals(fogStorageService.getHost()))
-                .findFirst()
-                .orElse(null);
-
+        FogStorageServiceHost fromAvailable;
+        if (onlyService != null) {
+            fromAvailable = onlyService;
+        } else {
+            fromAvailable = availableServices.stream()
+                    .filter(fh -> fh.getHost().equals(fogStorageService.getHost()))
+                    .findFirst()
+                    .orElse(null);
+        }
         if (fromAvailable == null) {
             //not available
             return;

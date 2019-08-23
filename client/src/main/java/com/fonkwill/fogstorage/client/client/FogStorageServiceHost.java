@@ -1,22 +1,37 @@
 package com.fonkwill.fogstorage.client.client;
 
+import com.fonkwill.fogstorage.client.domain.SharedSecret;
+
 public class FogStorageServiceHost {
 
-    public FogStorageServiceHost(FogStorageService fogStorageService, String host) {
-        this.fogStorageService = fogStorageService;
+    private FogStorageFileService fogStorageFileService;
+
+    private String host;
+
+    private SharedSecret sharedSecret;
+
+
+    public FogStorageServiceHost(FogStorageFileService fogStorageFileService, String host, SharedSecret sharedSecret) {
+        this.fogStorageFileService = fogStorageFileService;
         this.host = host;
+        this.sharedSecret = sharedSecret;
+
     }
 
-    public FogStorageService getFogStorageService() {
-        return fogStorageService;
+    public FogStorageFileService getFogStorageFileService() {
+        return fogStorageFileService;
     }
 
     public String getHost() {
         return host;
     }
 
-    private FogStorageService fogStorageService;
 
-    private String host;
+    public SharedSecret getSharedSecret() {
+        return sharedSecret;
+    }
 
+    public void setSharedSecret(SharedSecret sharedSecret) {
+        this.sharedSecret = sharedSecret;
+    }
 }

@@ -1,9 +1,12 @@
 package com.fonkwill.fogstorage.client.service.impl;
 
+import com.fonkwill.fogstorage.client.client.FogStorageFileService;
 import com.fonkwill.fogstorage.client.client.FogStorageServiceHost;
 import com.fonkwill.fogstorage.client.client.FogStorageServiceProvider;
+import com.fonkwill.fogstorage.client.client.vm.PlacementVM;
 import com.fonkwill.fogstorage.client.domain.*;
 import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
+import com.fonkwill.fogstorage.client.security.EnDeCryptionService;
 import com.fonkwill.fogstorage.client.service.exception.FileServiceException;
 import com.fonkwill.fogstorage.client.service.utils.Stopwatch;
 import okhttp3.MediaType;
@@ -32,9 +35,9 @@ public class FileUploadService extends  AbstractFileService {
     private Map<Integer, ProcessingResult> processingResultMap = new ConcurrentHashMap<>();
 
 
+    public FileUploadService(FogStorageServiceProvider fogStorageServiceProvider, EnDeCryptionService enDeCryptionService, TaskExecutor taskExecutor) {
+        super(fogStorageServiceProvider, taskExecutor, enDeCryptionService);
 
-    public FileUploadService(FogStorageServiceProvider fogStorageServiceProvider, TaskExecutor taskExecutor) {
-        super(fogStorageServiceProvider, taskExecutor);
     }
 
 
@@ -128,36 +131,56 @@ public class FileUploadService extends  AbstractFileService {
         RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), content);
         MultipartBody.Part requestBody = MultipartBody.Part.createFormData("uploadFile", "uploadFile", requestFile);
 
-        FogStorageServiceHost fogStorageService = fogStorageServiceProvider.getService();
+        FogStorageServiceHost fogStorageServiceHost = fogStorageServiceProvider.getService();
 
         Placement placement = null;
         Measurement measurement = null;
 
         boolean successful = false;
         Long throughFogNodeTotalTime = null;
-        while (fogStorageService!=null && !successful){
-            Call<Placement> uploadCall = fogStorageService.getFogStorageService().upload(requestBody, placementStrategy.isUseFogAsStorage(), placementStrategy.getDataChunksCount(), placementStrategy.getParityChunksCount());
+        while (fogStorageServiceHost!=null && !successful){
+            FogStorageFileService fogStorageFileService = fogStorageServiceHost.getFogStorageFileService();
+            Call<PlacementVM> uploadCall = fogStorageFileService.upload(requestBody, placementStrategy.isUseFogAsStorage(), placementStrategy.getDataChunksCount(), placementStrategy.getParityChunksCount());
 
-            Response<Placement> response = null;
+            Response<PlacementVM> response = null;
             try {
                 Stopwatch stopwatch = new Stopwatch();
                 response = uploadCall.execute();
                 throughFogNodeTotalTime = stopwatch.stop();
             } catch (IOException e) {
                 logger.error("Could not execute upload call successfully.", e);
-                fogStorageServiceProvider.markAsInvalid(fogStorageService);
-                fogStorageService = fogStorageServiceProvider.getService();
+                fogStorageServiceProvider.markAsInvalid(fogStorageServiceHost);
+                fogStorageServiceHost = fogStorageServiceProvider.getService();
                 continue;
             }
             if (!response.isSuccessful()) {
                 logger.error("Got error at uploading, error-code {}", response.code());
-                fogStorageServiceProvider.markAsInvalid(fogStorageService);
-                fogStorageService = fogStorageServiceProvider.getService();
+                fogStorageServiceProvider.markAsInvalid(fogStorageServiceHost);
+                fogStorageServiceHost = fogStorageServiceProvider.getService();
                 continue;
             }
+            PlacementVM responseVM = response.body();
+            try {
+                if (responseVM != null) {
+                    placement =  enDeCryptionService.decryptPlacement(responseVM.getEncodedPlacement(), fogStorageServiceHost.getSharedSecret().getValue());
+                }
+                else {
+                    logger.error("Placement could not retrieveed");
+                    fogStorageServiceProvider.markAsInvalid(fogStorageServiceHost);
+                    fogStorageServiceHost = fogStorageServiceProvider.getService();
+                    continue;
+                }
+            } catch (EncryptionException e) {
+                logger.error("Could not decrpyt placement");
+                fogStorageServiceProvider.markAsInvalid(fogStorageServiceHost);
+                fogStorageServiceHost = fogStorageServiceProvider.getService();
+                continue;
+            }
+
+
             successful = true;
 
-            placement = response.body();
+
             measurement = new Measurement(response.headers());
         }
 
@@ -166,7 +189,7 @@ public class FileUploadService extends  AbstractFileService {
         }
 
         measurement.setEnDecryptionTime(encryptionTime);
-        measurement.setThroughFogNodeTotalTime(fogStorageService.getHost(), throughFogNodeTotalTime);
+        measurement.setThroughFogNodeTotalTime(fogStorageServiceHost.getHost(), throughFogNodeTotalTime);
 
         ProcessingResult result = new ProcessingResult();
         result.setMeasurement(measurement);

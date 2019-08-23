@@ -6,6 +6,7 @@ import com.fonkwill.fogstorage.client.encryption.Decrypter;
 import com.fonkwill.fogstorage.client.encryption.Encrypter;
 import com.fonkwill.fogstorage.client.encryption.impl.AbstractAesService;
 import com.fonkwill.fogstorage.client.encryption.impl.AesEncryptionService;
+import com.fonkwill.fogstorage.client.security.EnDeCryptionService;
 import org.springframework.core.task.TaskExecutor;
 
 import java.util.List;
@@ -27,6 +28,8 @@ public abstract class AbstractFileService {
 
     protected  ArrayBlockingQueue<Integer> transferThreads;
 
+    protected EnDeCryptionService enDeCryptionService;
+
     public void enableEncryption() {
         this.encryptionActivated = true;
     }
@@ -45,12 +48,14 @@ public abstract class AbstractFileService {
 
 
 
-    public AbstractFileService(FogStorageServiceProvider fogStorageServiceProvider, TaskExecutor taskExecutor) {
+
+    public AbstractFileService(FogStorageServiceProvider fogStorageServiceProvider, TaskExecutor taskExecutor, EnDeCryptionService enDeCryptionService) {
         this.fogStorageServiceProvider = fogStorageServiceProvider;
         this.hosts = fogStorageServiceProvider.getHosts();
         this.taskExecutor = taskExecutor;
         int availableServices = fogStorageServiceProvider.getNumberOfavailableServices();
         //one possible runnable for every service
         this.transferThreads = new ArrayBlockingQueue<>( availableServices);
+        this.enDeCryptionService = enDeCryptionService;
     }
 }

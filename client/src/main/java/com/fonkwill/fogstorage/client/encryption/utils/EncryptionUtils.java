@@ -6,6 +6,8 @@ import javax.crypto.SecretKey;
 import javax.xml.bind.DatatypeConverter;
 
 import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
@@ -28,6 +30,28 @@ public class EncryptionUtils {
         }
 
     }
+
+    public static KeyPair getKeyPair(int length) throws EncryptionException {
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(length);
+            return keyPairGenerator.generateKeyPair();
+        } catch (NoSuchAlgorithmException e) {
+            throw new EncryptionException("Wrong algorithm used");
+        }
+
+    }
+
+    public static String getPrivateKey(KeyPair keyPair) {
+        return Base64.getEncoder().encodeToString(keyPair.getPrivate().getEncoded());
+    }
+
+    public static String getPublicKey(KeyPair keyPair) {
+        return Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
+
+    }
+
+
 
 
 

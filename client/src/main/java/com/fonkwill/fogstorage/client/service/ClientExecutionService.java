@@ -3,6 +3,8 @@ package com.fonkwill.fogstorage.client.service;
 import com.fonkwill.fogstorage.client.domain.MeasurementResult;
 import com.fonkwill.fogstorage.client.domain.PlacementStrategy;
 import com.fonkwill.fogstorage.client.domain.UploadMode;
+import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
+import com.fonkwill.fogstorage.client.encryption.utils.EncryptionUtils;
 import com.fonkwill.fogstorage.client.service.exception.ClientServiceException;
 import com.fonkwill.fogstorage.client.service.exception.FileServiceException;
 import org.apache.commons.cli.*;
@@ -11,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyPair;
 import java.util.Map;
 
 public class ClientExecutionService {
@@ -18,15 +21,17 @@ public class ClientExecutionService {
     private static final Logger logger = LoggerFactory.getLogger(ClientExecutionService.class);
 
     private Options options = new Options();
+    private Option generateKeyOption = new Option("g", false, "Generate private/public Key");
     private Option uploadOption = new Option("u", true, "Upload file");
     private Option downloadOption = new Option("d", true, "Upload file");
     private Option useFogAsStorageOption = new Option("f", false, "Use fog as storage");
     private Option dataChunksCountOption = new Option("c", true, "Number of data chunks (default: 2)");
     private Option parityChunksCountOption = new Option("p", true, "Number of parity chunks (default: 1)");
     private Option hostOption = new Option("h", true, "Host");
-    private Option splitOption = new Option("n", true, "Number of kilobytes for splitting up the file");
+    private Option splitOption = new Option("k", true, "Number of kilobytes for splitting up the file");
     private Option encryptionOption = new Option("e", false, "AesEncryptionService enabled");
     private Option scenarioOption = new Option("s", true, "Scenario with given file");
+    private Option userOption = new Option("n", true, "Username");
 
     private CommandLine cmd;
 
@@ -45,6 +50,8 @@ public class ClientExecutionService {
         options.addOption(splitOption);
         options.addOption(encryptionOption);
         options.addOption(scenarioOption);
+        options.addOption(generateKeyOption);
+        options.addOption(userOption);
         CommandLineParser parser = new DefaultParser();
 
         try {
@@ -62,11 +69,14 @@ public class ClientExecutionService {
         this.fogStorageContext.setSplitMode(isInSplitMode());
         this.fogStorageContext.setCountBytesForSplit(getBytesCountForSplit());
         this.fogStorageContext.setEncryptionMode(isInEcryptionMode());
+        this.fogStorageContext.setUsername(getUserName());
 
         this.fileService = fileService;
     }
 
-
+    private String getUserName() {
+        return cmd.getOptionValue(userOption.getOpt());
+    }
 
 
     public boolean isUploadMode() {
@@ -93,6 +103,7 @@ public class ClientExecutionService {
         return cmd.hasOption(encryptionOption.getOpt());
     }
 
+    public boolean hasUsername() {return cmd.hasOption(userOption.getOpt());}
 
     public UploadMode getUploadMode() {
 
@@ -156,6 +167,22 @@ public class ClientExecutionService {
     }
 
     public MeasurementResult execute() {
+        if (isKeyGenerationMode()) {
+            String privateKey ="";
+            String publicKey ="";
+            try {
+                KeyPair keyPair = EncryptionUtils.getKeyPair(2048);
+                privateKey = EncryptionUtils.getPrivateKey(keyPair);
+                publicKey = EncryptionUtils.getPublicKey(keyPair);
+            } catch (EncryptionException e) {
+                System.err.println("Could not generate private/public key pair");
+            }
+
+            System.out.println("Public Key: " +  publicKey);
+            System.out.println("Private Key: " + privateKey);
+            return new MeasurementResult();
+        }
+
         if (isUploadMode()) {
 
             String file = getFile();
@@ -184,6 +211,10 @@ public class ClientExecutionService {
             return measurementResult;
         }
         return null;
+    }
+
+    private boolean isKeyGenerationMode() {
+        return cmd.hasOption(generateKeyOption.getOpt());
     }
 
 

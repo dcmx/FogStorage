@@ -23,17 +23,16 @@ import java.util.Base64;
 public class AesEncryptionService  extends AbstractAesService implements Encrypter {
 
 
+    public AesEncryptionService(String key) throws EncryptionException {
+        this.key = key;
+        init();
+    }
+
+
     public AesEncryptionService() throws EncryptionException {
         this.key = EncryptionUtils.getKey(keyLengthBit, algorithm);
-        byte[] bytesKey = DatatypeConverter.parseHexBinary(this.key);
+        init();
 
-        this.secretKeySpec = new SecretKeySpec(bytesKey, algorithm);
-        try {
-            this.cipher = Cipher.getInstance(algorithmAndPadding);
-
-        } catch (NoSuchAlgorithmException  | NoSuchPaddingException  e) {
-            throw new EncryptionException("Could not create EncryptionService", e);
-        }
     }
 
     @Override
@@ -61,6 +60,11 @@ public class AesEncryptionService  extends AbstractAesService implements Encrypt
 
     public String getKey() {
         return key;
+    }
+
+    private void init() {
+        byte[] bytesKey = DatatypeConverter.parseHexBinary(this.key);
+        this.secretKeySpec = new SecretKeySpec(bytesKey, algorithm);
     }
 
 

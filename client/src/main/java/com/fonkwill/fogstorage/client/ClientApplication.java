@@ -15,7 +15,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
+import java.io.Console;
 import java.util.Map;
+import java.util.Scanner;
 
 
 @SpringBootApplication
@@ -40,6 +42,7 @@ public class ClientApplication implements CommandLineRunner {
 	        return;
         }
 
+
         ClientExecutionService executionService = null;
 	    try {
             executionService = new ClientExecutionService(args, fogStorageContext, fileService);
@@ -47,6 +50,21 @@ public class ClientApplication implements CommandLineRunner {
 	        logger.error(e.getMessage() + e.getCause().getMessage());
 	        return;
         }
+	    if (!executionService.hasUsername()) {
+	        logger.error("No username give");
+	        return;
+        }
+
+        Console console = System.console();
+        String enteredPassword;
+        if (console != null) {
+            enteredPassword = new String(console.readPassword("Password:"));
+        } else {
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Password:");
+            enteredPassword = scanner.next();
+        }
+	    fogStorageContext.setPassword(enteredPassword);
 
 	    if (executionService.isScenarioMode()) {
 	        new ScenarioRunner(fogStorageContext, fileService, executionService.getScenarioFile());

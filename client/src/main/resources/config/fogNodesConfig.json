@@ -2,23 +2,28 @@
   "nodes": [
     {
       "name": "HONOR8",
-      "url": "http://192.168.1.104:8081"
+      "url": "http://192.168.1.104:8081",
+      "publicKey": "PUBLIC"
     },
     {
       "name": "LOCAL",
-      "url": "http://localhost:8081"
+      "url": "http://localhost:8081",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAi/S5k6pfKEIALgdIzdBdLoBa0FV3VHzk46AW2SH2OQ3rpEJGUtPddZmFkZgiTiCO0ai68292hhDkQXYWKJQAU73H/w+v5QQo1xYifZPuczv7AWhdShP1dAsuffDyXpvmUsHNs8UefcudEiqbvymahU7wij8UmW9zjYae0Z3Md+4Q86zGydYEe+y6rqgqdUG+T5S1ehbmHsGSbn6z+lhDxCeXZ5ezneqmTtPaJNWpQEfMJWFaIoC6i519s+V3X9WJ6/yRHicBb+ttYT3pv59i+y5xK38MHtdMirXxv/fEYXdih9JMF1IcnKQQClt9ixkBfSh9d+PJ4G8J4A/S+xK8iwIDAQAB"
     },
     {
       "name": "HONOR7",
-      "url": "http://192.168.1.103:8081"
+      "url": "http://192.168.1.103:8081",
+      "publicKey": "PUBLIC"
     },
     {
       "name": "PI",
-      "url": "http://192.168.1.110:8081"
+      "url": "http://192.168.1.110:8081",
+      "publicKey": "PUBLIC"
     },
     {
       "name": "PI2",
-      "url": "http://192.168.1.109:8081"
+      "url": "http://192.168.1.109:8081",
+      "publicKey": "PUBLIC"
     }
 
 

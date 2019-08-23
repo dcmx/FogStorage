@@ -9,6 +9,7 @@ public class FogNode {
 
     private String url;
 
+    private String publicKey;
 
     public String getName() {
         return name;
@@ -36,6 +37,13 @@ public class FogNode {
         return this;
     }
 
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -49,4 +57,5 @@ public class FogNode {
     public int hashCode() {
         return Objects.hash(name, url);
     }
+
 }

@@ -1,24 +1,21 @@
 package com.fonkwill.fogstorage.client.service.impl;
 
-import com.fonkwill.fogstorage.client.client.FogStorageService;
 import com.fonkwill.fogstorage.client.client.FogStorageServiceHost;
 import com.fonkwill.fogstorage.client.client.FogStorageServiceProvider;
+import com.fonkwill.fogstorage.client.client.vm.PlacementVM;
 import com.fonkwill.fogstorage.client.domain.*;
 import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
+import com.fonkwill.fogstorage.client.security.EnDeCryptionService;
 import com.fonkwill.fogstorage.client.service.exception.FileServiceException;
 import com.fonkwill.fogstorage.client.service.utils.Stopwatch;
 import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.stereotype.Component;
 import retrofit2.Call;
 import retrofit2.Response;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -27,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Phaser;
 
@@ -45,8 +41,8 @@ public class FileDownloadService extends  AbstractFileService {
 
     private Path targetFilePath;
 
-    public FileDownloadService(FogStorageServiceProvider fogStorageServiceProvider, TaskExecutor taskExecutor) {
-        super(fogStorageServiceProvider, taskExecutor);
+    public FileDownloadService(FogStorageServiceProvider fogStorageServiceProvider, TaskExecutor taskExecutor, EnDeCryptionService enDeCryptionService) {
+        super(fogStorageServiceProvider, taskExecutor, enDeCryptionService);
     }
 
     public Measurement download(Bytes bytes, Placement placement) throws FileServiceException {
@@ -59,7 +55,19 @@ public class FileDownloadService extends  AbstractFileService {
         byte[] contentDownload = null;
         Long uploadThroughFogNodeTotal = null;
         while (fogStorageService != null && !successful) {
-            Call<ResponseBody> downloadCall = fogStorageService.getFogStorageService().download(placement);
+            SharedSecret sharedSecret = fogStorageService.getSharedSecret();
+
+            PlacementVM placementVM = new PlacementVM();
+            try {
+                String encryptedPlacement = enDeCryptionService.encryptPlacement(placement, sharedSecret.getValue());
+                placementVM.setEncodedPlacement(encryptedPlacement);
+            } catch (EncryptionException e) {
+               fogStorageServiceProvider.markAsInvalid(fogStorageService);
+               fogStorageService = fogStorageServiceProvider.getService();
+               logger.error("Could not encrypt placement");
+               continue;
+            }
+            Call<ResponseBody> downloadCall = fogStorageService.getFogStorageFileService().download(placementVM);
 
             Response<ResponseBody> response = null;
             try {

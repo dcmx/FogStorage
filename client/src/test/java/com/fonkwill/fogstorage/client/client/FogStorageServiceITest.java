@@ -1,7 +1,14 @@
 package com.fonkwill.fogstorage.client.client;
 
+import com.fonkwill.fogstorage.client.client.authenticaton.FogStorageAuthenticator;
+import com.fonkwill.fogstorage.client.client.vm.PlacementVM;
 import com.fonkwill.fogstorage.client.domain.*;
 import com.fonkwill.fogstorage.client.domain.enumeration.FogStorageNodeType;
+import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
+import com.fonkwill.fogstorage.client.encryption.impl.AbstractAesService;
+import com.fonkwill.fogstorage.client.encryption.utils.EncryptionUtils;
+import com.fonkwill.fogstorage.client.security.EnDeCryptionService;
+import com.fonkwill.fogstorage.client.service.FogStorageContext;
 import okhttp3.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +29,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 import static org.assertj.core.api.Assertions.*;
@@ -34,8 +42,21 @@ public class FogStorageServiceITest {
     @Autowired
     ResourceLoader resourceLoader;
 
+    @Autowired
+    EnDeCryptionService enDeCryptionService;
+
     @Value("${application-test.fog-url}")
     private String fog_url = "";
+
+    @Value("${application-test.fog-pk}")
+    private String fog_pk = "";
+
+    @Value("${application-test.fog-user}")
+    private String fog_user = "";
+
+    @Value("${application-test.fog-pw}")
+    private String fog_pw = "";
+
 
     private static final Logger logger = LoggerFactory.getLogger(FogStorageServiceITest.class);
 
@@ -89,14 +110,33 @@ public class FogStorageServiceITest {
         placement.setPlacementStrategy(strategy);
 
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(fog_url).addConverterFactory(GsonConverterFactory.create())
-                .build();
+        String key = null;
+        try {
+            key = EncryptionUtils.getKey(AbstractAesService.keyLengthBit, AbstractAesService.algorithm);
+        } catch (EncryptionException e) {
+            fail();
+        }
 
-        FogStorageService fogStorageMiddlware = retrofit.create(FogStorageService.class);
+        SharedSecret sharedSecret = new SharedSecret();
+        sharedSecret.setValue(key);
+
+        FogStorageContext fogStorageContext = new FogStorageContext();
+        fogStorageContext.setUsername(fog_user);
+        fogStorageContext.setPassword(fog_pw);
+
+        FogStorageAuthenticator fogStorageAuthenticator = new FogStorageAuthenticator(fog_url, sharedSecret, fog_pk, fogStorageContext, enDeCryptionService);
+
+        FogStorageFileService fogStorageMiddlware = getFogStorageFileService(fogStorageAuthenticator);
 
 
-        Call<ResponseBody> call2 = fogStorageMiddlware.download(placement);
+        PlacementVM placementVM = new PlacementVM();
+        try {
+            placementVM.setEncodedPlacement(enDeCryptionService.encryptPlacement(placement, key ));
+        } catch (EncryptionException e) {
+            fail();
+        }
+
+        Call<ResponseBody> call2 = fogStorageMiddlware.download(placementVM);
         ResponseBody resource1 = null;
         Headers headers = null;
         try {
@@ -124,6 +164,23 @@ public class FogStorageServiceITest {
 
     }
 
+    private FogStorageFileService getFogStorageFileService(FogStorageAuthenticator fogStorageAuthenticator) {
+        //noinspection Duplicates
+        OkHttpClient okHttpClient = new OkHttpClient().newBuilder().
+                authenticator(fogStorageAuthenticator).
+                addInterceptor(fogStorageAuthenticator).
+                connectTimeout(50, TimeUnit.SECONDS).
+                readTimeout(50, TimeUnit.SECONDS).
+                writeTimeout(50, TimeUnit.SECONDS).
+                build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(fog_url).addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
+                .build();
+
+        return retrofit.create(FogStorageFileService.class);
+    }
+
     @Test
     public void testUpload_ShouldUpload(){
         if (fog_url == null || fog_url.isEmpty()) {
@@ -146,27 +203,46 @@ public class FogStorageServiceITest {
         } catch (IOException e) {
             fail();
         }
+        String key = null;
+        try {
+            key = EncryptionUtils.getKey(AbstractAesService.keyLengthBit, AbstractAesService.algorithm);
+        } catch (EncryptionException e) {
+            fail();
+        }
+        SharedSecret sharedSecret = new SharedSecret();
+        sharedSecret.setValue(key);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(fog_url).addConverterFactory(GsonConverterFactory.create())
-                .build();
+        FogStorageContext fogStorageContext = new FogStorageContext();
+        fogStorageContext.setUsername(fog_user);
+        fogStorageContext.setPassword(fog_pw);
 
-        FogStorageService fogStorageMiddlware = retrofit.create(FogStorageService.class);
+        FogStorageAuthenticator fogStorageAuthenticator = new FogStorageAuthenticator(fog_url, sharedSecret, fog_pk, fogStorageContext, enDeCryptionService);
+
+        FogStorageFileService fogStorageMiddlware = getFogStorageFileService(fogStorageAuthenticator);
 
 
-        Call<Placement> call = fogStorageMiddlware.upload(body, placementStrategy.isUseFogAsStorage(), placementStrategy.getDataChunksCount(), placementStrategy.getParityChunksCount());
+        Call<PlacementVM> call = fogStorageMiddlware.upload(body, placementStrategy.isUseFogAsStorage(), placementStrategy.getDataChunksCount(), placementStrategy.getParityChunksCount());
 
-        Placement placement = null;
+        PlacementVM placementVM = null;
         Headers headers = null;
         try {
-             Response<Placement> response = call.execute();
-             placement = response.body();
+             Response<PlacementVM> response = call.execute();
+             placementVM = response.body();
              headers = response.headers();
              assertEquals(response.code(), 200);
         } catch (IOException e) {
+            e.printStackTrace();
             fail();
         }
-        assertNotNull(placement);
+        assertNotNull(placementVM);
+
+        try {
+            Placement placement = enDeCryptionService.decryptPlacement(placementVM.getEncodedPlacement(), sharedSecret.getValue());
+            assertThat(placement).isNotNull();
+        } catch (EncryptionException e) {
+            fail();
+        }
+
 
 
         Measurement measurement = new Measurement(headers);

@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 
 
 @SpringBootTest
-public class EncryptionTest {
+public class AesEncryptionTest {
 
 
     @Test
@@ -25,8 +25,6 @@ public class EncryptionTest {
             AesEncryptionService aesEncryptionService = new AesEncryptionService();
             String secret = aesEncryptionService.getKey();
 
-
-
             byte[] cipher = aesEncryptionService.encrypt(plaintext.getBytes(StandardCharsets.UTF_8));
 
             AesDecryptionService aesDecryptionService = new AesDecryptionService(secret);
@@ -36,8 +34,8 @@ public class EncryptionTest {
             assertEquals(new String(plain, StandardCharsets.UTF_8), plaintext);
 
         } catch (EncryptionException e) {
-            fail();
             e.printStackTrace();
+            fail(e.getMessage());
         }
 
 

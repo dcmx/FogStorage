@@ -1,4 +1,4 @@
-package com.fonkwill.fogstorage.middleware.api.vm;
+package com.fonkwill.fogstorage.client.client.vm;
 
 public class PlacementVM {
 

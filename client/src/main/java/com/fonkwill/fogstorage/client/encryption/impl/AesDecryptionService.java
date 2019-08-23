@@ -27,13 +27,7 @@ public class AesDecryptionService extends AbstractAesService implements Decrypte
         byte[] bytesKey = DatatypeConverter.parseHexBinary(this.key);
 
         this.secretKeySpec = new SecretKeySpec(bytesKey, algorithm);
-        try {
-            this.cipher = Cipher.getInstance(algorithmAndPadding);
 
-
-        } catch (NoSuchAlgorithmException  | NoSuchPaddingException  e) {
-            throw new EncryptionException("Could not create DecryptionService", e);
-        }
     }
 
 
