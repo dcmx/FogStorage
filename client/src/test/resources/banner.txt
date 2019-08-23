@@ -1,0 +1,4 @@
+${AnsiColor.GREEN}      FOGSTORAGE
+${AnsiColor.RED}        Middleware
+:: Running Spring Boot ${spring-boot.version} ::
+

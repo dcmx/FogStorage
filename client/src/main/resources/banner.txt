@@ -1,0 +1,4 @@
+${AnsiColor.GREEN}      FOGSTORAGE
+${AnsiColor.RED}        Client
+:: Running Spring Boot ${spring-boot.version} ::
+

@@ -10,7 +10,7 @@ public interface FogStorageService {
 
     @Multipart
     @POST("/services/middleware/api/files/upload")
-    Call<Placement> upload(@Part MultipartBody.Part uploadFile,
+    Call<String> upload(@Part MultipartBody.Part uploadFile,
                            @Part("useFogAsStorage") boolean useFogAsStorage,
                            @Part("dataChunksCount") int dataChunksCount,
                            @Part("parityChunksCount") int parityChunksCount);
@@ -18,6 +18,7 @@ public interface FogStorageService {
 
     @POST("/services/middleware/api/files/download")
     Call<ResponseBody> download(@Body Placement placement);
+
 
 
 }
