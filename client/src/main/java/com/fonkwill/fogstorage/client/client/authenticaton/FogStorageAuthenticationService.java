@@ -8,7 +8,7 @@ import retrofit2.http.POST;
 
 public interface FogStorageAuthenticationService {
 
-    @POST("/services/middleware/api/authenticate")
+    @POST("/services/middleware/api/authenticate-user")
     Call<TokenVM> authenticate(@Body LoginVM login);
 
 }

@@ -42,7 +42,6 @@ public class ClientApplication implements CommandLineRunner {
 	        return;
         }
 
-
         ClientExecutionService executionService = null;
 	    try {
             executionService = new ClientExecutionService(args, fogStorageContext, fileService);
