@@ -10,6 +10,7 @@ import com.fonkwill.fogstorage.client.service.exception.FileServiceException;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,6 +33,7 @@ public class ClientExecutionService {
     private Option encryptionOption = new Option("e", false, "AesEncryptionService enabled");
     private Option scenarioOption = new Option("s", true, "Scenario with given file");
     private Option userOption = new Option("n", true, "Username");
+    private Option uiOption = new Option("x", false, "Start UI");
 
     private CommandLine cmd;
 
@@ -52,6 +54,7 @@ public class ClientExecutionService {
         options.addOption(scenarioOption);
         options.addOption(generateKeyOption);
         options.addOption(userOption);
+        options.addOption(uiOption);
         CommandLineParser parser = new DefaultParser();
 
         try {
@@ -218,4 +221,7 @@ public class ClientExecutionService {
     }
 
 
+    public boolean isUiMode() {
+        return cmd.hasOption(uiOption.getOpt());
+    }
 }
