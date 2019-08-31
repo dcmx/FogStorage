@@ -65,6 +65,9 @@ public class MainController extends AbstractController {
     @FXML
     private Tab tab_upload;
 
+    @FXML
+    private Slider i_threadsPerService;
+
     private FileChooser fileChooser = new FileChooser();
 
     private List<CheckBox> checkboxes;
@@ -120,7 +123,8 @@ public class MainController extends AbstractController {
         List<String> chosenHosts = p_checkboxes.getChildren().stream().map(cb -> (CheckBox) cb).filter(CheckBox::isSelected).map(cb -> cb.textProperty().get()).collect(Collectors.toList());
         String chosenHostsString = String.join(",",chosenHosts);
         argsCommand +="-h "+chosenHostsString + " ";
-        argsCommand +="-n "+fogStorageContext.getUsername();
+        argsCommand +="-n "+fogStorageContext.getUsername() + " ";
+        argsCommand +="-t "+ (int) i_threadsPerService.getValue();
 
         String[] args = argsCommand.split(" ");
 

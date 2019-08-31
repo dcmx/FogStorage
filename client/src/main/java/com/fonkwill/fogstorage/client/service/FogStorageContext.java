@@ -18,6 +18,12 @@ public class FogStorageContext {
     private int countBytesForSplit;
     private boolean encryptionMode;
 
+    public int getThreadsPerService() {
+        return threadsPerService;
+    }
+
+    private int threadsPerService;
+
     public List<String> getHosts() {
         return hosts;
     }
@@ -85,5 +91,9 @@ public class FogStorageContext {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setThreadsPerService(Integer threadsPerService) {
+        this.threadsPerService = threadsPerService;
     }
 }

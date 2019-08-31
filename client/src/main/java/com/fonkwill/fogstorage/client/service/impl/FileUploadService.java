@@ -35,8 +35,8 @@ public class FileUploadService extends  AbstractFileService {
     private Map<Integer, ProcessingResult> processingResultMap = new ConcurrentHashMap<>();
 
 
-    public FileUploadService(FogStorageServiceProvider fogStorageServiceProvider, EnDeCryptionService enDeCryptionService, TaskExecutor taskExecutor) {
-        super(fogStorageServiceProvider, taskExecutor, enDeCryptionService);
+    public FileUploadService(FogStorageServiceProvider fogStorageServiceProvider, EnDeCryptionService enDeCryptionService, TaskExecutor taskExecutor, int threadsPerService) {
+        super(fogStorageServiceProvider, taskExecutor, enDeCryptionService, threadsPerService);
 
     }
 

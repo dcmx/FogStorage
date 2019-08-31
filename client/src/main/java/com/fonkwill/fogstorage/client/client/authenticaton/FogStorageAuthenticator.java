@@ -16,7 +16,12 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalUnit;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class FogStorageAuthenticator implements Authenticator, Interceptor {
 
@@ -40,6 +45,8 @@ public class FogStorageAuthenticator implements Authenticator, Interceptor {
     private EnDeCryptionService enDeCryptionService;
 
     private Random random;
+
+    private Instant lastAuthenticated;
 
     private boolean sharedSecretUsed = false;
 
@@ -66,6 +73,14 @@ public class FogStorageAuthenticator implements Authenticator, Interceptor {
 
         //no multiple authentications in parallel
         synchronized (this) {
+
+            //if last authentication is not at least 20 seconds in the past, don't authenticate again
+            if (token != null && !lastAuthenticated.isBefore(Instant.now().minus(20, ChronoUnit.SECONDS))){
+                return response.request().newBuilder()
+                        .removeHeader(AUTHORIZATION_HEADER)
+                        .addHeader(AUTHORIZATION_HEADER, BEARER + " " + this.token)
+                        .build();
+            }
             String randomString = String.valueOf(this.random.nextInt());
             try {
                 if (this.sharedSecretUsed) {
@@ -103,6 +118,9 @@ public class FogStorageAuthenticator implements Authenticator, Interceptor {
                     return null;
                 }
 
+
+                //everythings fine
+                lastAuthenticated = Instant.now();
                 return response.request().newBuilder()
                         .removeHeader(AUTHORIZATION_HEADER)
                         .addHeader(AUTHORIZATION_HEADER, BEARER + " " + this.token)

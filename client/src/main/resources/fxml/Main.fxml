@@ -24,13 +24,15 @@
                            <children>
                               <Label layoutX="24.0" layoutY="17.0" text="Data Chunks" />
                               <Slider fx:id="i_dataChunks" blockIncrement="1.0" layoutX="21.0" layoutY="38.0" majorTickUnit="1.0" max="10.0" minorTickCount="0" prefHeight="45.0" prefWidth="190.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="2.0" />
-                              <Label layoutX="21.0" layoutY="90.0" text="Parity Chunks" />
+                              <Label layoutX="21.0" layoutY="94.0" text="Parity Chunks" />
                               <Slider fx:id="i_parityChunks" blockIncrement="1.0" layoutX="21.0" layoutY="116.0" majorTickUnit="1.0" max="10.0" minorTickCount="0" prefHeight="45.0" prefWidth="190.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
                               <ToggleButton fx:id="tb_encryption" layoutX="253.0" layoutY="38.0" mnemonicParsing="false" text="Encryption" />
                               <ToggleButton fx:id="tb_fogstorage" layoutX="248.0" layoutY="111.0" mnemonicParsing="false" text="Fog Storage" />
-                              <Label layoutX="384.0" layoutY="17.0" text="Block size" />
-                              <Slider fx:id="i_blockSize" blockIncrement="256.0" layoutX="375.0" layoutY="45.0" majorTickUnit="256.0" max="10240.0" min="256.0" minorTickCount="0" prefHeight="44.0" prefWidth="217.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1024.0" />
-                              <Label fx:id="l_blockSize" layoutX="384.0" layoutY="90.0" text="1024" />
+                              <Label layoutX="380.0" layoutY="17.0" text="Block size" />
+                              <Slider fx:id="i_blockSize" blockIncrement="256.0" layoutX="375.0" layoutY="38.0" majorTickUnit="256.0" max="10240.0" min="256.0" minorTickCount="0" prefHeight="44.0" prefWidth="217.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1024.0" />
+                              <Label fx:id="l_blockSize" layoutX="463.0" layoutY="16.0" text="1024" />
+                              <Slider fx:id="i_threadsPerService" blockIncrement="1.0" layoutX="375.0" layoutY="116.0" majorTickUnit="1.0" max="4.0" min="1.0" minorTickCount="0" prefHeight="45.0" prefWidth="190.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
+                              <Label layoutX="381.0" layoutY="95.0" text="Threads per Service" />
                            </children>
                         </Pane>
                      </children></AnchorPane>
