@@ -62,7 +62,7 @@ public class FileServiceImpl implements FileService {
         Stopwatch stopwatch = new Stopwatch();
 
         FogStorageServiceProvider fogStorageServiceProvider = new FogStorageServiceProvider(fogStorageServiceFactory, fogStorageContext.getHosts());
-        fileDownloadService = new FileDownloadService(fogStorageServiceProvider, taskExecutor, enDeCryptionService);
+        fileDownloadService = new FileDownloadService(fogStorageServiceProvider, taskExecutor, enDeCryptionService, fogStorageContext.getThreadsPerService());
 
         RegenerationInfo placement = placementRepository.getPlacement(toPlacement);
         List<Placement> placementList = placement.getPlacementList();
@@ -102,7 +102,7 @@ public class FileServiceImpl implements FileService {
         Stopwatch stopwatch = new Stopwatch();
 
         FogStorageServiceProvider fogStorageServiceProvider = new FogStorageServiceProvider(fogStorageServiceFactory, fogStorageContext.getHosts());
-        fileUploadService = new FileUploadService(fogStorageServiceProvider, enDeCryptionService, taskExecutor);
+        fileUploadService = new FileUploadService(fogStorageServiceProvider, enDeCryptionService, taskExecutor, fogStorageContext.getThreadsPerService());
 
         RegenerationInfo regenerationInfo = new RegenerationInfo();
 

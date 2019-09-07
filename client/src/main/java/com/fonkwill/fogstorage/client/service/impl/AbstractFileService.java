@@ -30,6 +30,8 @@ public abstract class AbstractFileService {
 
     protected EnDeCryptionService enDeCryptionService;
 
+    protected int threadsPerService;
+
     public void enableEncryption() {
         this.encryptionActivated = true;
     }
@@ -48,14 +50,14 @@ public abstract class AbstractFileService {
 
 
 
-
-    public AbstractFileService(FogStorageServiceProvider fogStorageServiceProvider, TaskExecutor taskExecutor, EnDeCryptionService enDeCryptionService) {
+    public AbstractFileService(FogStorageServiceProvider fogStorageServiceProvider, TaskExecutor taskExecutor, EnDeCryptionService enDeCryptionService, int threadsPerService) {
+        this.threadsPerService = threadsPerService;
         this.fogStorageServiceProvider = fogStorageServiceProvider;
         this.hosts = fogStorageServiceProvider.getHosts();
         this.taskExecutor = taskExecutor;
         int availableServices = fogStorageServiceProvider.getNumberOfavailableServices();
         //one possible runnable for every service
-        this.transferThreads = new ArrayBlockingQueue<>( availableServices);
+        this.transferThreads = new ArrayBlockingQueue<>( availableServices * threadsPerService );
         this.enDeCryptionService = enDeCryptionService;
     }
 }

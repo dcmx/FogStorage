@@ -41,9 +41,10 @@ public class FileDownloadService extends  AbstractFileService {
 
     private Path targetFilePath;
 
-    public FileDownloadService(FogStorageServiceProvider fogStorageServiceProvider, TaskExecutor taskExecutor, EnDeCryptionService enDeCryptionService) {
-        super(fogStorageServiceProvider, taskExecutor, enDeCryptionService);
+    public FileDownloadService(FogStorageServiceProvider fogStorageServiceProvider, TaskExecutor taskExecutor, EnDeCryptionService enDeCryptionService,  int threadsPerService) {
+        super(fogStorageServiceProvider, taskExecutor, enDeCryptionService, threadsPerService);
     }
+
 
     public Measurement download(Bytes bytes, Placement placement) throws FileServiceException {
 

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+
+<AnchorPane prefHeight="604.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fonkwill.fogstorage.ui.MainController">
+   <children>
+      <TabPane layoutY="116.0" prefHeight="200.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab fx:id="tab_upload" text="Upload">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Pane prefHeight="160.0" prefWidth="600.0">
+                           <children>
+                              <Label layoutX="24.0" layoutY="17.0" text="Data Chunks" />
+                              <Slider fx:id="i_dataChunks" blockIncrement="1.0" layoutX="21.0" layoutY="38.0" majorTickUnit="1.0" max="10.0" minorTickCount="0" prefHeight="45.0" prefWidth="190.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="2.0" />
+                              <Label layoutX="21.0" layoutY="94.0" text="Parity Chunks" />
+                              <Slider fx:id="i_parityChunks" blockIncrement="1.0" layoutX="21.0" layoutY="116.0" majorTickUnit="1.0" max="10.0" minorTickCount="0" prefHeight="45.0" prefWidth="190.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
+                              <ToggleButton fx:id="tb_encryption" layoutX="253.0" layoutY="38.0" mnemonicParsing="false" text="Encryption" />
+                              <ToggleButton fx:id="tb_fogstorage" layoutX="248.0" layoutY="111.0" mnemonicParsing="false" text="Fog Storage" />
+                              <Label layoutX="380.0" layoutY="17.0" text="Block size" />
+                              <Slider fx:id="i_blockSize" blockIncrement="256.0" layoutX="375.0" layoutY="38.0" majorTickUnit="256.0" max="10240.0" min="256.0" minorTickCount="0" prefHeight="44.0" prefWidth="217.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1024.0" />
+                              <Label fx:id="l_blockSize" layoutX="463.0" layoutY="16.0" text="1024" />
+                              <Slider fx:id="i_threadsPerService" blockIncrement="1.0" layoutX="375.0" layoutY="116.0" majorTickUnit="1.0" max="4.0" min="1.0" minorTickCount="0" prefHeight="45.0" prefWidth="190.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
+                              <Label layoutX="381.0" layoutY="95.0" text="Threads per Service" />
+                           </children>
+                        </Pane>
+                     </children></AnchorPane>
+            </content>
+          </Tab>
+          <Tab fx:id="tab_download" text="Download">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+      <HBox fx:id="p_checkboxes" alignment="CENTER" layoutY="62.0" prefHeight="54.0" prefWidth="600.0" spacing="10.0">
+         <padding>
+            <Insets left="5.0" right="5.0" />
+         </padding>
+      </HBox>
+      <Button fx:id="btn_chooseFile" layoutX="462.0" layoutY="14.0" mnemonicParsing="false" onAction="#onButtonChooseFile" text="Choose File" />
+      <Label fx:id="l_filename" layoutX="39.0" layoutY="19.0" prefHeight="21.0" prefWidth="403.0" text="Filename" />
+      <Button layoutX="7.0" layoutY="325.0" mnemonicParsing="false" onAction="#onButtonExecute" text="Execute" />
+      <TextArea fx:id="tf_result" layoutX="21.0" layoutY="368.0" prefHeight="219.0" prefWidth="546.0" />
+   </children>
+</AnchorPane>

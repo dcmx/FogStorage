@@ -2,11 +2,13 @@ package com.fonkwill.fogstorage.client;
 
 import com.fonkwill.fogstorage.client.config.ApplicationProperties;
 import com.fonkwill.fogstorage.client.domain.MeasurementResult;
+import com.fonkwill.fogstorage.client.repository.FogNodeRepository;
 import com.fonkwill.fogstorage.client.service.ClientExecutionService;
 import com.fonkwill.fogstorage.client.service.FileService;
 import com.fonkwill.fogstorage.client.service.FogStorageContext;
 import com.fonkwill.fogstorage.client.service.exception.ClientServiceException;
 import com.fonkwill.fogstorage.scenario.ScenarioRunner;
+import com.fonkwill.fogstorage.ui.FogStorageUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,10 @@ public class ClientApplication implements CommandLineRunner {
     @Autowired
     private FogStorageContext fogStorageContext;
 
+
+    @Autowired
+    private FogNodeRepository fogNodeRepository;
+
 	private static final Logger logger = LoggerFactory.getLogger(ClientApplication.class);
 
 	public static void main(String[] args) {
@@ -49,6 +55,16 @@ public class ClientApplication implements CommandLineRunner {
 	        logger.error(e.getMessage() + e.getCause().getMessage());
 	        return;
         }
+	    if (executionService.isUiMode()){
+	        FogStorageUI fogStorageUI = FogStorageUI.getInstance();
+
+	        fogStorageUI.setFogStorageContext(fogStorageContext);
+	        fogStorageUI.setFileService(fileService);
+	        fogStorageUI.setFogNodeRepository(fogNodeRepository);
+	        return;
+        }
+
+
 	    if (!executionService.hasUsername()) {
 	        logger.error("No username give");
 	        return;

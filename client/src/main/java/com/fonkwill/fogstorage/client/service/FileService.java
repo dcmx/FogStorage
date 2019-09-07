@@ -4,8 +4,10 @@ import com.fonkwill.fogstorage.client.domain.Measurement;
 import com.fonkwill.fogstorage.client.domain.MeasurementResult;
 import com.fonkwill.fogstorage.client.domain.UploadMode;
 import com.fonkwill.fogstorage.client.service.exception.FileServiceException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.file.Path;
+
 
 public interface FileService {
 

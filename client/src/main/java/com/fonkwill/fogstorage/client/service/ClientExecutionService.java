@@ -10,6 +10,7 @@ import com.fonkwill.fogstorage.client.service.exception.FileServiceException;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,6 +33,8 @@ public class ClientExecutionService {
     private Option encryptionOption = new Option("e", false, "AesEncryptionService enabled");
     private Option scenarioOption = new Option("s", true, "Scenario with given file");
     private Option userOption = new Option("n", true, "Username");
+    private Option uiOption = new Option("x", false, "Start UI");
+    private Option threadsOption = new Option("t", true, "Amount of threads per service");
 
     private CommandLine cmd;
 
@@ -52,6 +55,8 @@ public class ClientExecutionService {
         options.addOption(scenarioOption);
         options.addOption(generateKeyOption);
         options.addOption(userOption);
+        options.addOption(uiOption);
+        options.addOption(threadsOption);
         CommandLineParser parser = new DefaultParser();
 
         try {
@@ -70,8 +75,17 @@ public class ClientExecutionService {
         this.fogStorageContext.setCountBytesForSplit(getBytesCountForSplit());
         this.fogStorageContext.setEncryptionMode(isInEcryptionMode());
         this.fogStorageContext.setUsername(getUserName());
+        this.fogStorageContext.setThreadsPerService(getThreadsPerService());
 
         this.fileService = fileService;
+    }
+
+    private Integer getThreadsPerService() {
+        int result = 1;
+        if (cmd.hasOption(threadsOption.getOpt())) {
+            result = getIntegerFromOptValue(threadsOption);
+        }
+        return result;
     }
 
     private String getUserName() {
@@ -218,4 +232,7 @@ public class ClientExecutionService {
     }
 
 
+    public boolean isUiMode() {
+        return cmd.hasOption(uiOption.getOpt());
+    }
 }
