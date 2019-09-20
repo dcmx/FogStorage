@@ -21,7 +21,7 @@ public class EncryptionUtils {
     public static String getKey(int length, String algorithm) throws EncryptionException {
         try {
             KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm);
-            keyGenerator.init(length);
+            keyGenerator.init(length, SecureRandomUtil.getSecureRandomInstance());
             SecretKey secretKey = keyGenerator.generateKey();
             byte[] byteKey = secretKey.getEncoded();
             return  DatatypeConverter.printHexBinary(byteKey);
