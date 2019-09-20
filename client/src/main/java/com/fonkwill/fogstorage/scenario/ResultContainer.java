@@ -31,6 +31,8 @@ public class ResultContainer {
 
     private String fileNamePath;
 
+    private String resultsFilePath = "./results.csv";
+
     private FileWriter fileWriter;
 
     public ResultContainer(String scenarioFile) {
@@ -281,10 +283,38 @@ public class ResultContainer {
     }
 
     public void addUploadMeasurmentResult(String title, MeasurementResult measurementResult) {
+        try (FileWriter csvWriter = new FileWriter(resultsFilePath, true)) {
+            List<String> rowData = new ArrayList<>();
+            rowData.add("U");
+            rowData.add(title);
+            Long fileSizeInBytes = measurementResult.getFileSize();
+            Long fileSizeInMB = fileSizeInBytes / 1024 / 1024;
+            rowData.add(fileSizeInMB.toString());
+            rowData.add(measurementResult.getTotalTime().toString());
+            csvWriter.append(String.join(CSV_DELIMITER, rowData));
+            csvWriter.append("\n");
+        } catch (IOException e) {
+            logger.error("Could not write to results file", e);
+        }
+
         addToMap(title, measurementResult, uploadMeasurementResultMap);
     }
 
     public void addDownloadMeasurmentResult(String title, MeasurementResult measurementResult) {
+
+        try (FileWriter csvWriter = new FileWriter(resultsFilePath, true)) {
+            List<String> rowData = new ArrayList<>();
+            rowData.add("D");
+            rowData.add(title);
+            Long fileSizeInBytes = measurementResult.getFileSize();
+            Long fileSizeInMB = fileSizeInBytes / 1024 / 1024;
+            rowData.add(fileSizeInMB.toString());
+            rowData.add(measurementResult.getTotalTime().toString());
+            csvWriter.append(String.join(CSV_DELIMITER, rowData));
+            csvWriter.append("\n");
+        } catch (IOException e) {
+            logger.error("Could not write to results file", e);
+        }
         addToMap(title, measurementResult, downloadMeasurementResultMap);
     }
 
@@ -296,4 +326,6 @@ public class ResultContainer {
         storedSet.add(measurementResult);
         downloadMeasurementResultMap.put(title, storedSet);
     }
+
+
 }

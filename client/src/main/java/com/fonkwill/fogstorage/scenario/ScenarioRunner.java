@@ -131,6 +131,7 @@ public class ScenarioRunner {
                 }
                 MeasurementResult measurementResult = executionService.execute();
                 if (i > 0 ) {
+
                     if (cmd.contains("-u")) {
                         resultContainer.addUploadMeasurmentResult(title, measurementResult);
                     } else if (cmd.contains("-d")) {

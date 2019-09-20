@@ -7,6 +7,15 @@ public class MeasurementResult {
 
     private Long codingTime = 0L;
 
+    private Long fileSize = 0L;
+
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
+    }
 
     private Long totalTime = 0L;
 
