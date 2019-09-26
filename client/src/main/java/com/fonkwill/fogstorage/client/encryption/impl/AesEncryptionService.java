@@ -33,7 +33,7 @@ public class AesEncryptionService  extends AbstractAesService implements Encrypt
 
     public AesEncryptionService(String key) throws EncryptionException {
         this.key = key;
-        this.random = new Random();
+     //   this.random = new Random();
      //   logger.debug("Going to instantiate secure Random");
       //  this.secureRandom = new SecureRandom();
       //  logger.debug("Secure Random instantiated");
@@ -64,7 +64,7 @@ public class AesEncryptionService  extends AbstractAesService implements Encrypt
 
 //            /**/logger.info("Got new random {}", this.toString());
             IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec );
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec, SecureRandomUtil.getSecureRandomInstance() );
 //            logger.info("Cipher inited {}", this.toString());
 
             byte[] result = cipher.doFinal(content);

@@ -4,6 +4,7 @@ import com.fonkwill.fogstorage.client.encryption.Decrypter;
 import com.fonkwill.fogstorage.client.encryption.Encrypter;
 import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
 import com.fonkwill.fogstorage.client.encryption.utils.EncryptionUtils;
+import com.fonkwill.fogstorage.client.encryption.utils.SecureRandomUtil;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -42,7 +43,7 @@ public class AesDecryptionService extends AbstractAesService implements Decrypte
             byte[] result = new byte[content.length - 16];
             byteBuffer.get(result, 0, content.length - 16);
 
-            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec,  new IvParameterSpec(iv));
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec,  new IvParameterSpec(iv), SecureRandomUtil.getSecureRandomInstance());
 
             return cipher.doFinal(result);
         } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException e) {

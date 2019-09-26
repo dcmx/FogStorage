@@ -89,7 +89,7 @@ public class FileServiceImpl implements FileService {
         } else {
             measurementResult = fileDownloadService.downloadInParts(placement, placementList, targetFilePath);
         }
-        measurementResult.setFileSize(targetFilePath.toFile().length());
+        measurementResult.setFileSize(placement.getFileSize());
         measurementResult.setTotalTime(stopwatch.stop());
         logger.info("Finished downloading");
         return measurementResult;
