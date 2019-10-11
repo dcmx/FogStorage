@@ -1,10 +1,8 @@
 package com.fonkwill.fogstorage.client.encryption;
 
-import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
-import com.fonkwill.fogstorage.client.encryption.impl.AesDecryptionService;
-import com.fonkwill.fogstorage.client.encryption.impl.AesEncryptionService;
-import com.fonkwill.fogstorage.client.encryption.impl.RsaDecryptionService;
-import com.fonkwill.fogstorage.client.encryption.impl.RsaEncryptionService;
+import com.fonkwill.fogstorage.client.cryptoservice.exception.EncryptionException;
+import com.fonkwill.fogstorage.client.cryptoservice.impl.RsaDecryptionService;
+import com.fonkwill.fogstorage.client.cryptoservice.impl.RsaEncryptionService;
 import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

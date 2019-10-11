@@ -1,14 +1,14 @@
 package com.fonkwill.fogstorage.client;
 
-import com.fonkwill.fogstorage.client.config.ApplicationProperties;
-import com.fonkwill.fogstorage.client.domain.MeasurementResult;
-import com.fonkwill.fogstorage.client.repository.FogNodeRepository;
-import com.fonkwill.fogstorage.client.service.ClientExecutionService;
-import com.fonkwill.fogstorage.client.service.FileService;
-import com.fonkwill.fogstorage.client.service.FogStorageContext;
-import com.fonkwill.fogstorage.client.service.exception.ClientServiceException;
-import com.fonkwill.fogstorage.scenario.ScenarioRunner;
-import com.fonkwill.fogstorage.ui.FogStorageUI;
+import com.fonkwill.fogstorage.client.shared.config.ApplicationProperties;
+import com.fonkwill.fogstorage.client.shared.domain.MeasurementResult;
+import com.fonkwill.fogstorage.client.controller.repository.FogNodeRepository;
+import com.fonkwill.fogstorage.client.controller.ClientExecutionService;
+import com.fonkwill.fogstorage.client.fileservice.service.FileService;
+import com.fonkwill.fogstorage.client.controller.FogStorageContext;
+import com.fonkwill.fogstorage.client.fileservice.exception.ClientServiceException;
+import com.fonkwill.fogstorage.client.scenario.ScenarioRunner;
+import com.fonkwill.fogstorage.client.ui.FogStorageUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

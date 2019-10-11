@@ -1,14 +1,12 @@
 package com.fonkwill.fogstorage.client.encryption;
 
-import com.fonkwill.fogstorage.client.encryption.exception.EncryptionException;
-import com.fonkwill.fogstorage.client.encryption.impl.AesDecryptionService;
-import com.fonkwill.fogstorage.client.encryption.impl.AesEncryptionService;
+import com.fonkwill.fogstorage.client.cryptoservice.exception.EncryptionException;
+import com.fonkwill.fogstorage.client.cryptoservice.impl.AesDecryptionService;
+import com.fonkwill.fogstorage.client.cryptoservice.impl.AesEncryptionService;
 import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 
 import static org.junit.Assert.*;
 
