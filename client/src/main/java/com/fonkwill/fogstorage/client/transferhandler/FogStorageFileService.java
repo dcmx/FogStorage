@@ -9,14 +9,14 @@ import retrofit2.http.*;
 public interface FogStorageFileService {
 
     @Multipart
-    @POST("/services/middleware/api/files/upload")
+    @POST("/services/middleware/api/blocks/upload")
     Call<PlacementVM> upload(@Part MultipartBody.Part uploadFile,
                              @Part("useFogAsStorage") boolean useFogAsStorage,
                              @Part("dataChunksCount") int dataChunksCount,
                              @Part("parityChunksCount") int parityChunksCount);
 
 
-    @POST("/services/middleware/api/files/download")
+    @POST("/services/middleware/api/blocks/download")
     Call<ResponseBody> download(@Body PlacementVM placement);
 
 
