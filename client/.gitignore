@@ -30,3 +30,4 @@ build/
 ### VS Code ###
 .vscode/
 results.csv
+lib/jfxrt.jar

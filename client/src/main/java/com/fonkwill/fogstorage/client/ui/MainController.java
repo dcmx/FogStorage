@@ -64,6 +64,9 @@ public class MainController extends AbstractController {
     @FXML
     private Slider i_threadsPerService;
 
+    @FXML
+    private Slider i_threadsPerServiceD;
+
     private FileChooser fileChooser = new FileChooser();
 
     private List<CheckBox> checkboxes;
@@ -99,6 +102,7 @@ public class MainController extends AbstractController {
     }
 
     public void onButtonExecute(ActionEvent event){
+        int threadsPerService = 1;
         String argsCommand = "";
         if (tab_upload.isSelected()) {
             argsCommand += "-u "+ file.getAbsolutePath() + " ";
@@ -113,14 +117,16 @@ public class MainController extends AbstractController {
             argsCommand +="-p "+ (int) i_parityChunks.getValue() + " ";
             argsCommand +="-k "+ (int) i_blockSize.getValue() + " ";
 
+            threadsPerService = (int) i_threadsPerService.getValue();
         } else if (tab_download.isSelected()) {
             argsCommand += "-d "+ file.getAbsolutePath() + " ";
+            threadsPerService = (int) i_threadsPerServiceD.getValue();
         }
         List<String> chosenHosts = p_checkboxes.getChildren().stream().map(cb -> (CheckBox) cb).filter(CheckBox::isSelected).map(cb -> cb.textProperty().get()).collect(Collectors.toList());
         String chosenHostsString = String.join(",",chosenHosts);
         argsCommand +="-h "+chosenHostsString + " ";
         argsCommand +="-n "+fogStorageContext.getUsername() + " ";
-        argsCommand +="-t "+ (int) i_threadsPerService.getValue();
+        argsCommand +="-t "+ threadsPerService;
 
         String[] args = argsCommand.split(" ");
 

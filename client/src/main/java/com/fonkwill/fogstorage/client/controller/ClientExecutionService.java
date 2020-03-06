@@ -61,6 +61,8 @@ public class ClientExecutionService {
         try {
             this.cmd = parser.parse(options, args);
         } catch (ParseException e) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("fogStorageClient", options);
             throw new ClientServiceException("Could not parse arguments", e);
         }
 
@@ -77,6 +79,8 @@ public class ClientExecutionService {
         this.fogStorageContext.setThreadsPerService(getThreadsPerService());
 
         this.fileService = fileService;
+
+
     }
 
     private Integer getThreadsPerService() {

@@ -57,23 +57,23 @@ public class AesEncryptionService  extends AbstractAesService implements Encrypt
     @Override
     public byte[] encrypt(byte[] content) throws EncryptionException {
         try {
-         //   logger.info("Starting encrypt {}", this.toString());
+            //logger.debug("Starting encrypt {}", this.toString());
             Cipher cipher =  Cipher.getInstance(algorithmAndPadding);;
-          //  logger.info("Cipher instantiated {}", this.toString());
+            //logger.debug("Cipher instantiated {}", this.toString());
             byte[] iv =  SecureRandomUtil.getBytes(16);
 
-//            /**/logger.info("Got new random {}", this.toString());
+            //logger.debug("Got new random {}", this.toString());
             IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec, SecureRandomUtil.getSecureRandomInstance() );
-//            logger.info("Cipher inited {}", this.toString());
+            //logger.debug("Cipher initiated {}", this.toString());
 
             byte[] result = cipher.doFinal(content);
-//            logger.info("Result encrypted {}", this.toString());
+            //logger.debug("Result encrypted {}", this.toString());
             byte[] ivAdded = new byte[result.length + 16];
             ByteBuffer byteBuffer = ByteBuffer.wrap(ivAdded);
             byteBuffer.put(ivParameterSpec.getIV());
             byteBuffer.put(result);
-//            logger.info("Result added to buffer {}", this.toString());
+            //logger.debug("Result added to buffer {}", this.toString());
             return byteBuffer.array();
 
         } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException e) {

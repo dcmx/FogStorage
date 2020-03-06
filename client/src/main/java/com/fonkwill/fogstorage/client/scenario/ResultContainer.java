@@ -289,6 +289,7 @@ public class ResultContainer {
             Long fileSizeInMB = fileSizeInBytes / 1024 / 1024;
             rowData.add(fileSizeInMB.toString());
             rowData.add(measurementResult.getTotalTime().toString());
+            rowData.add(measurementResult.getEnDecryptionTime());
             csvWriter.append(String.join(CSV_DELIMITER, rowData));
             csvWriter.append("\n");
         } catch (IOException e) {
@@ -308,6 +309,7 @@ public class ResultContainer {
             Long fileSizeInMB = fileSizeInBytes / 1024 / 1024;
             rowData.add(fileSizeInMB.toString());
             rowData.add(measurementResult.getTotalTime().toString());
+            rowData.add(measurementResult.getEnDecryptionTime());
             csvWriter.append(String.join(CSV_DELIMITER, rowData));
             csvWriter.append("\n");
         } catch (IOException e) {

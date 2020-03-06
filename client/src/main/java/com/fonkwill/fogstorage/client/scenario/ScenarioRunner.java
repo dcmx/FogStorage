@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -154,6 +155,7 @@ public class ScenarioRunner {
     }
 
     private void scrambleFile(String file, int i) {
+        int hundredMB = 104857600;
         Path filePath = Paths.get(file);
         Long fileSize = filePath.toFile().length();
         if (fileSize > Integer.MAX_VALUE){
@@ -161,13 +163,38 @@ public class ScenarioRunner {
             return;
         }
         Path newFilePath = Paths.get(file+"_"+i);
-        byte[] newFile = new byte[fileSize.intValue()];
-        random.nextBytes(newFile);
-        try {
-            Files.write(newFilePath, newFile);
-        } catch (IOException e) {
-            logger.error("Could not scramble file");
+
+        if  (Files.exists(newFilePath)) {
+            return;
         }
+
+        boolean first = true;
+        byte[] newFile;
+        byte[] randomHundredMB = new byte[hundredMB];
+        random.nextBytes(randomHundredMB);
+        int remainingFileSize = fileSize.intValue();
+        while (remainingFileSize > 0 ) {
+            int newFileSize = remainingFileSize < hundredMB ? remainingFileSize : hundredMB;
+            if (newFileSize == hundredMB) {
+                newFile = randomHundredMB;
+            } else {
+                newFile = new byte[newFileSize];
+                random.nextBytes(newFile);
+            }
+            remainingFileSize = remainingFileSize - newFileSize;
+            try {
+                if (first) {
+                    Files.write(newFilePath, newFile);
+                    first = false;
+                } else {
+                    Files.write(newFilePath, newFile, StandardOpenOption.APPEND);
+                }
+            } catch (IOException e) {
+                logger.error("Could not scramble file");
+            }
+        }
+
+
 
 
     }
