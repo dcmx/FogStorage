@@ -1,0 +1,36 @@
+entity Chunk {
+	uuid String,
+    size Long,
+    accessed Integer,
+    storedLocally Boolean,
+    partner String
+}
+
+entity GeneralValue {
+	key String,
+    value String,
+    type String
+}
+
+entity Node {
+	name String,
+    url String,
+    type FogStorageNodeType,
+    latency Long
+}
+
+enum FogStorageNodeType {
+	AWS, GCP, FOG
+}
+
+
+// defining multiple OneToMany relationships with comments
+relationship ManyToOne {
+	Chunk{node} to Node,
+}
+
+// Set service options to all except few
+service all with serviceImpl 
+
+// Set an angular suffix
+// angularSuffix * with mySuffix

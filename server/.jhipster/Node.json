@@ -1,0 +1,33 @@
+{
+    "name": "Node",
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "url",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "type",
+            "fieldType": "FogStorageNodeType",
+            "fieldValues": "AWS,GCP,FOG"
+        },
+        {
+            "fieldName": "latency",
+            "fieldType": "Long"
+        }
+    ],
+    "relationships": [],
+    "changelogDate": "20190726130958",
+    "entityTableName": "node",
+    "dto": "no",
+    "pagination": "no",
+    "service": "serviceImpl",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "middleware",
+    "applications": "*",
+    "microserviceName": "middleware"
+}
