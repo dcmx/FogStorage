@@ -1,0 +1,16 @@
+spring:
+  task:
+    execution:
+      thread-name-prefix: client-task-
+      pool:
+        core-size: 4
+        max-size: 50
+        queue-capacity: 10000
+    scheduling:
+      thread-name-prefix: client-scheduling-
+      pool:
+        size: 2
+
+application:
+  client-name: "CLIENT_1"
+  fog-nodes-config-file: "classpath:config/fogNodesConfig.json"

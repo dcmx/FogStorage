@@ -1,0 +1,17 @@
+{
+  "nodes": [
+
+    {
+      "name": "FOG1",
+      "url": "http://128.131.172.41:8081",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnWta+seJmpcg1lPq0IRILys0al5ZqowUT18VdhMadJj9Qr3MxfsQd91qNe/xsf8m05Lq9SXK1A8z8unzZ1P6av8Dolw+4gydza+JTk9u4QBZAfDUJOCVPmvQphjvNpCnZcqfoJb2REEeiKo7J/NhFaPOpi3HGRkoekmVSbutDjrITTnatuAiCVQK9XdmOLBtyNRubmOiMuYv8QBTXxpj2Du1ARjEYmDJ6i/dEzSd8p1msYjhBOBzhPGZ9m94+ix0lmrvCsEF9ZMYjDqPeZ9UQ6mhJh+Bx6cGfkVmvi3ijpDDpq6gocJm1/AfwiAyVl7JER1VMsXHofHAYac9fftQDwIDAQAB"
+    },
+    {
+      "name": "FOG2",
+      "url": "http://128.131.172.43:8081",
+      "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoqUHdGh+D+pWNDnw7jx9BQEM749xLNuidmMFm+3arhk/ja5ZNgRZsWlj8ohfXctEQzO8ZfekGT95ildUGJwJRy+9NkmCmiHFW+QFNIu8WkGBPH866zDj83Ec7WpFFBi1WdruJ4Me1mDTTPLZv3R+B1d1gAPvXRbBAy/ye5+LaW/E4kSBWhs7kW9Da2t9mqTz48rd4CPEUIATJK/ah7+GCM30rzkGgDS1+C9JulJHJDulVVzaldiTyGmayKckraxDeQwKE3lnF6w3PnpwOqbq6GDgd2fOeX1CUkUGpmr/CCgFGl6iL+jKwyP4b5mNxWCI7tQIhGk4SLi47YunuVRMAQIDAQAB"
+    }
+
+
+  ]
+}

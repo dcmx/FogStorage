@@ -1,0 +1,9 @@
+application:
+  client-name: "CLIENT_1"
+  fog-nodes-config-file: "classpath:config/fogNodesConfig.json"
+
+application-test:
+  fog-url: ""
+  fog-pk: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAi/S5k6pfKEIALgdIzdBdLoBa0FV3VHzk46AW2SH2OQ3rpEJGUtPddZmFkZgiTiCO0ai68292hhDkQXYWKJQAU73H/w+v5QQo1xYifZPuczv7AWhdShP1dAsuffDyXpvmUsHNs8UefcudEiqbvymahU7wij8UmW9zjYae0Z3Md+4Q86zGydYEe+y6rqgqdUG+T5S1ehbmHsGSbn6z+lhDxCeXZ5ezneqmTtPaJNWpQEfMJWFaIoC6i519s+V3X9WJ6/yRHicBb+ttYT3pv59i+y5xK38MHtdMirXxv/fEYXdih9JMF1IcnKQQClt9ixkBfSh9d+PJ4G8J4A/S+xK8iwIDAQAB"
+  fog-user: "USER"
+  fog-pw: "Passwort"

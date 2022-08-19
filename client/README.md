@@ -1,0 +1,1 @@
+Implementation of the FogStorage Client which is part of the distributed storage solution presented in the thesis "A Privacy-Preserving Storage Service for the Fog" (https://repositum.tuwien.at/handle/20.500.12708/15631)
